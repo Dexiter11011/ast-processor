@@ -4,8 +4,6 @@
 
 Инструмент собирает настоящий пакет Office Open XML — `document.xml`, `styles.xml`, `numbering.xml`, relationships, media и `[Content_Types].xml` — без делегирования генерации документа чёрному ящику DOCX-библиотеки.
 
-**Документация:** https://dexiter11011.github.io/ast-processor/
-
 ## Что делает
 
 1. Читает Markdown-файл (опциональный YAML front matter для метаданных).
