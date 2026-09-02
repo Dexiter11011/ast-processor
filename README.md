@@ -4,8 +4,6 @@
 
 Инструмент собирает настоящий пакет Office Open XML — `document.xml`, `styles.xml`, `numbering.xml`, relationships, media и `[Content_Types].xml` — без делегирования генерации документа чёрному ящику DOCX-библиотеки.
 
-Проект **независим** от `document-platform-ver2`. Он живёт в том же git-репозитории, но не имеет Python-зависимостей на платформу.
-
 ## Что делает
 
 1. Читает Markdown-файл (опциональный YAML front matter для метаданных).
