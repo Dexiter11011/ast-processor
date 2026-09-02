@@ -1,47 +1,47 @@
-# Error Handling
+# Обработка ошибок
 
-Production error UX for the md2docx CLI and library.
+Производственный UX ошибок для CLI и библиотеки md2docx.
 
-## Exit codes
+## Коды выхода
 
-| Code | Meaning | Examples |
-|------|---------|----------|
-| 0 | Success | Conversion completed |
-| 1 | Usage / input configuration | Missing input, input is a directory, output is a directory, same input/output path |
-| 2 | Processing / output failure | Invalid theme, bad plugin, parse error, missing image, validation failure, I/O error |
+| Код | Значение | Примеры |
+|-----|----------|---------|
+| 0 | Успех | Конвертация завершена |
+| 1 | Использование / конфигурация ввода | Отсутствует входной файл, вход — каталог, выход — каталог, одинаковые пути ввода/вывода |
+| 2 | Сбой обработки / вывода | Неверная тема, некорректный плагин, ошибка разбора, отсутствующее изображение, сбой валидации, ошибка ввода-вывода |
 
-The CLI prints errors to **stderr** with the prefix `Error: `.
+CLI выводит ошибки в **stderr** с префиксом `Error: `.
 
-## Stable error codes
+## Стабильные коды ошибок
 
-Plugin and semantic APIs expose machine-readable `code` attributes on their exception types. See [`API.md`](API.md) and [`PLUGIN_MIGRATION.md`](PLUGIN_MIGRATION.md).
+API плагинов и семантический API предоставляют машиночитаемые атрибуты `code` у типов исключений. См. [`API.md`](API.md) и [`PLUGIN_MIGRATION.md`](PLUGIN_MIGRATION.md).
 
-## Atomic output guarantee
+## Гарантия атомарного вывода
 
-DOCX output is written through an atomic writer:
+Вывод DOCX записывается через атомарный writer:
 
-1. Bytes are written to a hidden temp file in the output directory (`.{name}.md2docx-{token}.tmp`).
-2. When `--validate` is set, validation runs on temp bytes **before** replace.
-3. On success, `os.replace` atomically updates the final path.
-4. On failure, the temp file is removed and any existing output file is **preserved**.
+1. Байты записываются во временный скрытый файл в каталоге вывода (`.{name}.md2docx-{token}.tmp`).
+2. При установленном `--validate` валидация выполняется над временными байтами **до** замены.
+3. При успехе `os.replace` атомарно обновляет итоговый путь.
+4. При сбое временный файл удаляется, а существующий выходной файл **сохраняется**.
 
-This applies to both plain and template conversion paths.
+Это применяется как к обычному пути конвертации, так и к конвертации с шаблоном.
 
 ## `--debug`
 
-Use `--debug` to print a full Python traceback for **unexpected** internal errors (bugs). Known domain errors (parse, theme, plugin, etc.) never print tracebacks.
+Используйте `--debug`, чтобы вывести полный Python traceback для **неожиданных** внутренних ошибок (багов). Известные доменные ошибки (разбор, тема, плагин и т. д.) никогда не выводят traceback.
 
-## Library vs CLI
+## Библиотека и CLI
 
-- **CLI** — catches exceptions, maps them to diagnostics, returns exit codes. Never raises to the shell except via `SystemExit`.
-- **Library** (`convert_markdown_to_docx`, etc.) — raises domain exceptions directly. Embedders should handle errors explicitly; no `sys.exit()` in the pipeline.
+- **CLI** — перехватывает исключения, сопоставляет их с диагностикой, возвращает коды выхода. Не пробрасывает исключения в shell, кроме как через `SystemExit`.
+- **Библиотека** (`convert_markdown_to_docx` и т. д.) — пробрасывает доменные исключения напрямую. Встраивающий код должен обрабатывать ошибки явно; в pipeline нет `sys.exit()`.
 
-## Pre-flight I/O checks
+## Предварительные проверки ввода-вывода
 
-Before conversion, the CLI validates:
+Перед конвертацией CLI проверяет:
 
-- Input exists and is a regular file (not a directory)
-- Output path is not an existing directory
-- Resolved input and output paths differ
+- Вход существует и является обычным файлом (не каталогом)
+- Путь вывода не является существующим каталогом
+- Разрешённые пути ввода и вывода различаются
 
-Parent directories for the output path are still created automatically on write (unchanged).
+Родительские каталоги для пути вывода по-прежнему создаются автоматически при записи (без изменений).

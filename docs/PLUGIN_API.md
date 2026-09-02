@@ -1,18 +1,18 @@
-# Plugin API Reference
+# Справочник Plugin API
 
-Public namespace: `md2docx.plugin_api`
+Публичное пространство имён: `md2docx.plugin_api`
 
-Internal modules (`md2docx.ooxml.*` builders, `md2docx.templates.merger`, full `ProcessingContext` mutation) are not part of the stable plugin contract.
+Внутренние модули (билдеры `md2docx.ooxml.*`, `md2docx.templates.merger`, полная мутация `ProcessingContext`) не входят в стабильный контракт плагинов.
 
-## API version
+## Версия API
 
 ```python
 from md2docx.plugin_api import PLUGIN_API_VERSION  # "1"
 ```
 
-Plugins declare `PluginMetadata.api_version = "1"`. Unsupported versions raise `UnsupportedApiVersionError`.
+Плагины объявляют `PluginMetadata.api_version = "1"`. Неподдерживаемые версии вызывают `UnsupportedApiVersionError`.
 
-## Plugin interface
+## Интерфейс плагина
 
 ```python
 from md2docx.plugin_api import PluginMetadata, PluginRegistry
@@ -28,49 +28,49 @@ class MyPlugin:
 plugin = MyPlugin()
 ```
 
-Entry point for `--plugin PATH`: module-level `plugin` object (or `get_plugin()` callable).
+Точка входа для `--plugin PATH`: объект `plugin` на уровне модуля (или вызываемый `get_plugin()`).
 
 ## PluginRegistry
 
-Facade over allowed extension types. Delegates to existing core registries where possible.
+Фасад над разрешёнными типами расширений. Делегирует существующим реестрам ядра, где это возможно.
 
-| Method | Purpose |
-|--------|---------|
-| `register_handler(type, handler)` | AST node type → `ElementHandler` |
-| `register_style(StyleDefinition)` | Semantic style via `StyleRegistry` |
-| `register_directive(DirectiveDefinition)` | HTML comment directive → AST |
-| `register_template_region(TemplateRegionDefinition)` | Template placeholder → fragment |
-| `register_validator(ValidatorDefinition)` | Phase-specific validation |
-| `freeze()` | Lock registry before conversion |
+| Метод | Назначение |
+|-------|------------|
+| `register_handler(type, handler)` | Тип узла AST → `ElementHandler` |
+| `register_style(StyleDefinition)` | Семантический стиль через `StyleRegistry` |
+| `register_directive(DirectiveDefinition)` | HTML-комментарий-директива → AST |
+| `register_template_region(TemplateRegionDefinition)` | Плейсхолдер шаблона → фрагмент |
+| `register_validator(ValidatorDefinition)` | Валидация по фазам |
+| `freeze()` | Блокировка реестра перед конвертацией |
 
-After `freeze()`, all `register_*` calls raise `RegistryFrozenError`.
+После `freeze()` все вызовы `register_*` вызывают `RegistryFrozenError`.
 
-Duplicate registrations raise `DuplicateRegistrationError`.
+Дублирующие регистрации вызывают `DuplicateRegistrationError`.
 
-## Namespace policy
+## Политика пространств имён
 
-| Resource | Example |
-|----------|---------|
-| Plugin name | `example.notes` |
-| AST type | `example.notes.note` |
-| Style semantic id | `example.notes.note` |
-| Template region | `example_note` |
-| Validator / directive name | `example.notes.validate_notes` |
+| Ресурс | Пример |
+|--------|--------|
+| Имя плагина | `example.notes` |
+| Тип AST | `example.notes.note` |
+| Семантический id стиля | `example.notes.note` |
+| Регион шаблона | `example_note` |
+| Имя валидатора / директивы | `example.notes.validate_notes` |
 
-Core names (`paragraph`, `content`, `toc`, …) are reserved.
+Имена ядра (`paragraph`, `content`, `toc`, …) зарезервированы.
 
-## Handlers
+## Обработчики
 
-Implement the existing handler protocol:
+Реализуйте существующий протокол обработчика:
 
 ```python
 def process(self, node, context, processor) -> None:
     ...
 ```
 
-Use `md2docx.ooxml.api` builders and `context.document.add_body_element()`. Do not edit raw XML or ZIP parts.
+Используйте билдеры `md2docx.ooxml.api` и `context.document.add_body_element()`. Не редактируйте сырой XML или части ZIP.
 
-## Directives
+## Директивы
 
 ```python
 DirectiveDefinition(
@@ -80,9 +80,9 @@ DirectiveDefinition(
 )
 ```
 
-Directives are matched on standalone lines after built-in directives.
+Директивы сопоставляются на отдельных строках после встроенных директив.
 
-## Template regions
+## Регионы шаблона
 
 ```python
 TemplateRegionDefinition(
@@ -92,9 +92,9 @@ TemplateRegionDefinition(
 )
 ```
 
-Template wins over Markdown: when `{{example_note}}` is present, matching AST nodes are stripped from the content fragment before rendering.
+Шаблон имеет приоритет над Markdown: при наличии `{{example_note}}` соответствующие узлы AST удаляются из фрагмента содержимого перед рендерингом.
 
-## Validators
+## Валидаторы
 
 ```python
 from md2docx.plugin_api import ValidationPhase, ValidatorDefinition
@@ -106,14 +106,14 @@ ValidatorDefinition(
 )
 ```
 
-Phases:
+Фазы:
 
-| Phase | When |
-|-------|------|
-| `PARSE` | After Markdown → AST |
-| `SEMANTIC` | After `process_document` walk, before navigation validation |
-| `RENDER` | After rendering, before package write |
-| `PACKAGE` | Reserved for future post-package hooks |
+| Фаза | Когда |
+|------|-------|
+| `PARSE` | После Markdown → AST |
+| `SEMANTIC` | После обхода `process_document`, до валидации навигации |
+| `RENDER` | После рендеринга, до записи пакета |
+| `PACKAGE` | Зарезервировано для будущих post-package хуков |
 
 ## CLI
 
@@ -121,29 +121,29 @@ Phases:
 md2docx input.md --plugin ./my_plugin.py -o output.docx
 ```
 
-Load failures print `Error: ...` without a traceback in normal mode.
+Сбои загрузки выводят `Error: ...` без traceback в обычном режиме.
 
-## Compatibility matrix
+## Матрица совместимости
 
-Supported:
+Поддерживается:
 
-- Custom AST nodes (namespaced dataclasses)
-- Handlers
-- Directives
-- Semantic styles
-- Template regions
-- Validators (PARSE / SEMANTIC / RENDER)
+- Пользовательские узлы AST (namespaced dataclasses)
+- Обработчики
+- Директивы
+- Семантические стили
+- Регионы шаблона
+- Валидаторы (PARSE / SEMANTIC / RENDER)
 
-Not supported:
+Не поддерживается:
 
-- Arbitrary raw OOXML
-- ZIP access
-- Remote plugin loading
-- Dependency resolver
-- Navigation target registration (v1)
-- Plugin sandboxing
+- Произвольный сырой OOXML
+- Доступ к ZIP
+- Удалённая загрузка плагинов
+- Резолвер зависимостей
+- Регистрация целей навигации (v1)
+- Песочница для плагинов
 
-## See also
+## См. также
 
 - [`PLUGINS.md`](PLUGINS.md)
 - [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md)

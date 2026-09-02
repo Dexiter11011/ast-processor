@@ -1,10 +1,10 @@
-# Advanced Markdown
+# Расширенный Markdown
 
-Iteration 24 adds footnotes, definition lists, and safe inline HTML on top of the existing AST → handler → OOXML pipeline.
+Итерация 24 добавляет сноски, списки определений и безопасный inline HTML поверх существующего pipeline AST → handler → OOXML.
 
-## Footnotes
+## Сноски
 
-Pandoc-style footnotes:
+Сноски в стиле Pandoc:
 
 ```markdown
 Text with a reference.[^label]
@@ -12,37 +12,37 @@ Text with a reference.[^label]
 [^label]: Footnote body text.
 ```
 
-- References become inline `FootnoteReference` AST nodes.
-- Definitions are collected on `Document.footnotes` and validated after parsing.
-- OOXML uses `word/footnotes.xml`, `w:footnoteReference`, and a footnotes relationship.
-- Template merge remaps generated footnote IDs when the template already contains footnotes.
+- Ссылки превращаются в inline-узлы AST `FootnoteReference`.
+- Определения собираются в `Document.footnotes` и проверяются после парсинга.
+- OOXML использует `word/footnotes.xml`, `w:footnoteReference` и связь footnotes.
+- При слиянии шаблона ID сгенерированных сносок переназначаются, если в шаблоне уже есть сноски.
 
-Errors:
+Ошибки:
 
 ```text
 Error in README.md: undefined footnote: architecture
 Error in README.md: duplicate footnote definition: note
 ```
 
-## Definition lists
+## Списки определений
 
-Pandoc/GFM-style definition lists:
+Списки определений в стиле Pandoc/GFM:
 
 ```markdown
 Term
 : Definition paragraph.
 ```
 
-Rendered as styled paragraphs:
+Рендерятся как стилизованные абзацы:
 
-- term — bold Normal paragraph
-- description — indented Normal paragraph
+- term — абзац Normal жирным
+- description — абзац Normal с отступом
 
-There is no native Word definition-list construct.
+В Word нет нативной конструкции списка определений.
 
-## Safe inline HTML
+## Безопасный inline HTML
 
-Inline HTML tokenization is enabled, but only an allowlisted subset maps to existing AST nodes:
+Токенизация inline HTML включена, но только разрешённое подмножество сопоставляется с существующими узлами AST:
 
 | HTML | AST |
 |------|-----|
@@ -53,29 +53,29 @@ Inline HTML tokenization is enabled, but only an allowlisted subset maps to exis
 | `a` with safe `href` | `Link` |
 | `span` (no attributes) | unwrap children |
 
-Allowed URL schemes: `http`, `https`, `mailto`.
+Разрешённые схемы URL: `http`, `https`, `mailto`.
 
-Blocked examples: `script`, `iframe`, `img`, block tags such as `div`.
+Заблокированные примеры: `script`, `iframe`, `img`, блочные теги вроде `div`.
 
-Unknown inline tags that are not blocked are preserved as literal text so existing escaping fixtures keep working.
+Неизвестные inline-теги, которые не заблокированы, сохраняются как буквальный текст, чтобы существующие фикстуры escape продолжали работать.
 
-Errors:
+Ошибки:
 
 ```text
 Error in README.md: unsupported HTML element: iframe
 Error in README.md: unsafe URL scheme: javascript
 ```
 
-## Architecture
+## Архитектура
 
-| Component | Must not know |
-|-----------|---------------|
+| Компонент | Не должен знать |
+|-----------|-----------------|
 | `MarkdownParser` / `html_adapter` | OOXML, relationships |
-| `FootnoteManager` | Markdown syntax |
-| `DefinitionListHandler` | Parser tokens |
+| `FootnoteManager` | Синтаксис Markdown |
+| `DefinitionListHandler` | Токены парсера |
 | `build_footnotes_xml` | CLI, front matter |
 
-## Parser plugins
+## Плагины парсера
 
 ```python
 MarkdownIt("commonmark", {"html": True})
@@ -85,4 +85,4 @@ MarkdownIt("commonmark", {"html": True})
     .use(deflist_plugin)
 ```
 
-HTML comment block directives (`<!-- toc -->`, table directives, etc.) continue to work; HTML comment blocks are skipped during block conversion.
+Блочные HTML-комментарии-директивы (`<!-- toc -->`, директивы таблиц и т.д.) продолжают работать; блочные HTML-комментарии пропускаются при блочной конвертации.

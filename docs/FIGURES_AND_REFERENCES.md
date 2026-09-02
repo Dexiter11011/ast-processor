@@ -1,8 +1,8 @@
-# Figures, Captions, Sequences & Cross-References
+# Рисунки, подписи, последовательности и перекрёстные ссылки
 
-Iteration 20 adds semantic figure/table captions with Word field-based numbering and cross-references.
+Итерация 20 добавляет семантические подписи к рисункам/таблицам с нумерацией на основе полей Word и перекрёстными ссылками.
 
-## Architecture
+## Архитектура
 
 ```text
 Image
@@ -32,36 +32,36 @@ Bookmark (table-{slug})
 REF field
 ```
 
-## Separation of concerns
+## Разделение ответственности
 
-| Mechanism | Role |
-|-----------|------|
-| Caption text | Human-readable description after the sequence number |
-| SEQ field | Word computes 1, 2, 3… per sequence name |
-| Bookmark | Stable anchor for REF (`figure-architecture`, not `figure-1`) |
-| REF field | Inserts sequence number from bookmark at reference site |
-| Caption style | Theme-driven presentation (italic, smaller) |
+| Механизм | Роль |
+|----------|------|
+| Текст подписи | Человекочитаемое описание после номера последовательности |
+| Поле SEQ | Word вычисляет 1, 2, 3… для каждого имени последовательности |
+| Закладка | Стабильный якорь для REF (`figure-architecture`, а не `figure-1`) |
+| Поле REF | Вставляет номер последовательности из закладки в месте ссылки |
+| Стиль подписи | Оформление через тему (курсив, меньший размер) |
 
-**Caption text ≠ SEQ number ≠ Bookmark ≠ REF ≠ static number**
+**Текст подписи ≠ номер SEQ ≠ закладка ≠ REF ≠ статический номер**
 
-The application never increments `figure_number` counters. Word evaluates `SEQ Figure` / `SEQ Table` on open.
+Приложение никогда не инкрементирует счётчики `figure_number`. Word вычисляет `SEQ Figure` / `SEQ Table` при открытии.
 
-## Semantic model
+## Семантическая модель
 
-Package: `md2docx.captions`
+Пакет: `md2docx.captions`
 
-| Type | Purpose |
-|------|---------|
+| Тип | Назначение |
+|-----|------------|
 | `CaptionKind` | `FIGURE`, `TABLE` |
-| `SequenceKind` | Maps to Word SEQ names `"Figure"`, `"Table"` |
-| `Caption` | `kind` + `text` (no `number` field) |
-| `Figure` | `image` + optional `caption` |
-| `TableWithCaption` | `table` + optional `caption` |
+| `SequenceKind` | Соответствует именам SEQ Word `"Figure"`, `"Table"` |
+| `Caption` | `kind` + `text` (без поля `number`) |
+| `Figure` | `image` + необязательная `caption` |
+| `TableWithCaption` | `table` + необязательная `caption` |
 | `CrossReference` | `target`, `kind`, `prefix` |
-| `SequenceManager` | Identity/labels only — **not** a counter |
-| `CaptionService` | Renders figures, tables, cross-references |
+| `SequenceManager` | Только идентичность/метки — **не** счётчик |
+| `CaptionService` | Рендерит рисунки, таблицы, перекрёстные ссылки |
 
-## OOXML caption structure
+## Структура подписи в OOXML
 
 ```text
 w:p [Caption style]
@@ -73,7 +73,7 @@ w:p [Caption style]
 └── w:bookmarkEnd
 ```
 
-Cross-reference paragraph:
+Абзац перекрёстной ссылки:
 
 ```text
 w:p [Normal]
@@ -82,32 +82,32 @@ w:p [Normal]
 └── REF figure-bookmark \r \h
 ```
 
-- `\r` — insert relative sequence number from bookmark
-- `\h` — hyperlink to bookmark
+- `\r` — вставить относительный номер последовательности из закладки
+- `\h` — гиперссылка на закладку
 
-Heading REF fields (Iteration 19) keep `\h` only.
+Поля REF для заголовков (Итерация 19) сохраняют только `\h`.
 
-## Placement defaults
+## Расположение по умолчанию
 
-| Object | Order |
-|--------|-------|
-| Figure | Image → Caption (below) |
-| Table | Caption → Table (above) |
+| Объект | Порядок |
+|--------|---------|
+| Figure | Изображение → подпись (снизу) |
+| Table | Подпись → таблица (сверху) |
 
-## Bookmark naming
+## Именование закладок
 
-Derived from caption text via `slugify()`:
+Производится из текста подписи через `slugify()`:
 
-| Caption text | Bookmark |
-|--------------|----------|
+| Текст подписи | Закладка |
+|---------------|----------|
 | Architecture overview | `figure-architecture-overview` |
 | Configuration values | `table-configuration-values` |
 
-Duplicates get numeric suffix: `figure-architecture-1`.
+Дубликаты получают числовой суффикс: `figure-architecture-1`.
 
-## Internal API (Markdown syntax deferred)
+## Внутренний API (синтаксис Markdown отложен)
 
-Build AST programmatically and convert:
+Собирайте AST программно и конвертируйте:
 
 ```python
 from pathlib import Path
@@ -118,37 +118,37 @@ doc = build_interleaved_figures_tables_document()
 convert_ast_to_docx(doc, Path("out.docx"), source_dir=Path("tests/fixtures"))
 ```
 
-Registered handlers:
+Зарегистрированные обработчики:
 
-| AST type | Handler |
-|----------|---------|
+| Тип AST | Обработчик |
+|---------|------------|
 | `figure` | `FigureHandler` |
 | `table_with_caption` | `TableWithCaptionHandler` |
 | `cross_reference` | `CrossReferenceHandler` |
 
-## Styles
+## Стили
 
-Semantic style `caption` → OOXML `Caption` (italic, 9pt, spacing after 120 twips).
+Семантический стиль `caption` → OOXML `Caption` (курсив, 9pt, отступ после 120 twips).
 
-Both figure and table captions share one Caption style; kind is semantic, not a separate style.
+Подписи к рисункам и таблицам используют один стиль Caption; вид задаётся семантически, а не отдельным стилем.
 
-## Validation
+## Проверка
 
-- REF targets must exist in `BookmarkManager` at conversion time
-- `ReferenceManager` validates typed cross-references (figure REF must target a figure bookmark)
-- `NavigationRegistry` tracks semantic targets in document order
-- Package validator cross-checks REF instructions against `w:bookmarkStart` names
-- Invalid bookmark/sequence names rejected by field parser whitelist
+- Цели REF должны существовать в `BookmarkManager` на момент конвертации
+- `ReferenceManager` проверяет типизированные перекрёстные ссылки (REF на рисунок должен указывать на закладку рисунка)
+- `NavigationRegistry` отслеживает семантические цели в порядке документа
+- Валидатор пакета сверяет инструкции REF с именами `w:bookmarkStart`
+- Недопустимые имена закладок/последовательностей отклоняются белым списком парсера полей
 
-## Related docs
+## Связанные документы
 
-- [`NAVIGATION.md`](NAVIGATION.md) — NavigationRegistry, LOF/LOT, template remapping
-- [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) — SEQ, REF field details
-- [`REFERENCES_AND_TOC.md`](REFERENCES_AND_TOC.md) — heading bookmarks and hyperlinks
-- [`THEMES.md`](THEMES.md) — Caption style in theme system
+- [`NAVIGATION.md`](NAVIGATION.md) — NavigationRegistry, LOF/LOT, переназначение закладок шаблона
+- [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) — детали полей SEQ, REF
+- [`REFERENCES_AND_TOC.md`](REFERENCES_AND_TOC.md) — закладки заголовков и гиперссылки
+- [`THEMES.md`](THEMES.md) — стиль Caption в системе тем
 
-## Remaining (post-Iteration 21)
+## Остаётся (после Итерации 21)
 
-- Markdown caption DSL (block directive or emphasis paragraph)
-- Image `title` attribute as caption source
-- Full Figure/Table label localization
+- DSL подписей в Markdown (блочная директива или абзац с emphasis)
+- Атрибут `title` изображения как источник подписи
+- Полная локализация меток Figure/Table

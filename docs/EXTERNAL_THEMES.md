@@ -1,8 +1,8 @@
-# External Document Themes (YAML)
+# Внешние темы документа (YAML)
 
-Iteration 16 adds external YAML themes and the `--theme` CLI flag.
+Итерация 16 добавляет внешние YAML-темы и флаг CLI `--theme`.
 
-## Architecture
+## Архитектура
 
 ```text
 YAML file
@@ -20,36 +20,36 @@ StylesXmlWriter
 word/styles.xml
 ```
 
-YAML never writes OOXML directly. There is no `raw_ooxml`, `xml`, or arbitrary style map in the schema.
+YAML никогда не записывает OOXML напрямую. В схеме нет `raw_ooxml`, `xml` или произвольной карты стилей.
 
-## Usage
+## Использование
 
 ```bash
 md2docx README.md --theme examples/themes/corporate.yaml -o README.docx
 ```
 
-Without `--theme`, the converter uses `DefaultTheme` exactly as before.
+Без `--theme` конвертер использует `DefaultTheme` точно так же, как раньше.
 
-## YAML schema (token-native)
+## Схема YAML (на основе токенов)
 
-External themes map to [`ThemeTokens`](../src/md2docx/styles/tokens.py) groups. Partial files merge on top of `DefaultTheme`.
+Внешние темы сопоставляются с группами [`ThemeTokens`](../src/md2docx/styles/tokens.py). Частичные файлы объединяются поверх `DefaultTheme`.
 
-### Top-level fields
+### Поля верхнего уровня
 
-| Field | Required | Description |
+| Поле | Обязательно | Описание |
 |-------|----------|-------------|
-| `name` | no | Metadata label (default: `unnamed`) |
-| `typography` | no | Body, heading, and code fonts/sizes |
-| `colors` | no | Text, heading, link, code, quote colors |
-| `spacing` | no | Paragraph, heading, list, TOC spacing |
-| `headings` | no | Heading level font sizes |
-| `page` | no | Page size, orientation, margins |
-| `link` | no | Hyperlink presentation |
-| `table` | no | Table border/header defaults |
+| `name` | no | Метка метаданных (по умолчанию: `unnamed`) |
+| `typography` | no | Шрифты и размеры основного текста, заголовков и кода |
+| `colors` | no | Цвета текста, заголовков, ссылок, кода, цитат |
+| `spacing` | no | Интервалы абзацев, заголовков, списков, TOC |
+| `headings` | no | Размеры шрифтов уровней заголовков |
+| `page` | no | Размер страницы, ориентация, поля |
+| `link` | no | Представление гиперссылок |
+| `table` | no | Значения по умолчанию для границ/заголовков таблиц |
 
-Unknown keys at any level are rejected.
+Неизвестные ключи на любом уровне отклоняются.
 
-### Typography
+### Типографика
 
 ```yaml
 typography:
@@ -63,9 +63,9 @@ typography:
     size: 10pt
 ```
 
-### Colors
+### Цвета
 
-Six-digit hex, with or without `#`:
+Шестизначный hex, с `#` или без:
 
 ```yaml
 colors:
@@ -76,7 +76,7 @@ colors:
   quote: "666666"
 ```
 
-### Spacing and headings
+### Интервалы и заголовки
 
 ```yaml
 spacing:
@@ -90,11 +90,11 @@ headings:
   heading3: 16pt
 ```
 
-Supported length units: `pt` (default for bare numbers in spacing), `in`, `cm`, `mm`, `twips`.
+Поддерживаемые единицы длины: `pt` (по умолчанию для чисел без единиц в spacing), `in`, `cm`, `mm`, `twips`.
 
-Font sizes must use `pt` (or bare numbers interpreted as points).
+Размеры шрифтов должны использовать `pt` (или голые числа, интерпретируемые как пункты).
 
-### Page defaults
+### Параметры страницы по умолчанию
 
 ```yaml
 page:
@@ -108,11 +108,11 @@ page:
     left: 2cm
 ```
 
-Explicit section directives override theme page defaults.
+Явные директивы секций переопределяют значения страницы темы по умолчанию.
 
-## What each token group affects
+## На что влияет каждая группа токенов
 
-| Token group | Semantic styles / output |
+| Группа токенов | Семантические стили / вывод |
 |-------------|--------------------------|
 | `typography` | Normal defaults, headings, code block, inline code |
 | `colors` | Body text, heading runs, links, code, quotes |
@@ -122,15 +122,15 @@ Explicit section directives override theme page defaults.
 | `link` | Hyperlink underline |
 | `table` | Table border/header presentation |
 
-## Merge semantics
+## Семантика слияния
 
-External themes are **partial overrides** on `DefaultTheme`:
+Внешние темы — **частичные переопределения** поверх `DefaultTheme`:
 
-1. Start from built-in default tokens.
-2. For each YAML group present, merge field-by-field into that group.
-3. Pass merged tokens to `ThemeResolver`.
+1. Начать со встроенных токенов по умолчанию.
+2. Для каждой присутствующей группы YAML объединить поле за полем в эту группу.
+3. Передать объединённые токены в `ThemeResolver`.
 
-Example minimal theme:
+Пример минимальной темы:
 
 ```yaml
 name: minimal
@@ -138,27 +138,27 @@ colors:
   heading: "111111"
 ```
 
-All other properties remain from `DefaultTheme`.
+Все остальные свойства остаются из `DefaultTheme`.
 
-## Theme ≠ other systems
+## Тема ≠ другие системы
 
-| System | Relationship |
+| Система | Связь |
 |--------|--------------|
-| `RenderContext` | Inline bold/italic/strike/code — unchanged by theme file |
-| `NumberingManager` | List numId/ilvl — not configured by theme |
-| Table layout | Grid/widths — not configured by theme |
-| Sections | Explicit section layout beats theme page defaults |
+| `RenderContext` | Inline bold/italic/strike/code — без изменений от файла темы |
+| `NumberingManager` | List numId/ilvl — не настраивается темой |
+| Table layout | Grid/widths — не настраивается темой |
+| Sections | Явный макет секции имеет приоритет над значениями страницы темы по умолчанию |
 
-## Validation and errors
+## Валидация и ошибки
 
 - Missing file: `Error: theme file not found: path.yaml`
 - Invalid YAML: `Error: invalid theme YAML: line N, column M`
 - Schema: `Error: invalid theme: colors.heading must be a 6-digit hex color`
 - Unknown key: `Error: invalid theme: typographi unknown theme field`
 
-YAML is loaded with `yaml.safe_load` only.
+YAML загружается только через `yaml.safe_load`.
 
-## Unsupported in this iteration
+## Не поддерживается в этой итерации
 
 - JSON theme files
 - DOCX template themes
@@ -168,9 +168,9 @@ YAML is loaded with `yaml.safe_load` only.
 - `caption`, `table_header`, `table_cell` semantic styles (not in registry)
 - Per-heading colors (all headings share `colors.heading`)
 
-## Examples
+## Примеры
 
-- [`examples/themes/corporate.yaml`](../examples/themes/corporate.yaml) — full corporate preset
-- [`tests/fixtures/themes/minimal.yaml`](../tests/fixtures/themes/minimal.yaml) — single color override
+- [`examples/themes/corporate.yaml`](../examples/themes/corporate.yaml) — полный корпоративный пресет
+- [`tests/fixtures/themes/minimal.yaml`](../tests/fixtures/themes/minimal.yaml) — переопределение одного цвета
 
-See also [`THEMES.md`](THEMES.md) for the internal theme architecture.
+См. также [`THEMES.md`](THEMES.md) для внутренней архитектуры тем.

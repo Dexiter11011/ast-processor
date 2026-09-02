@@ -1,10 +1,10 @@
-# test/field — демо fields и metadata
+# test/field — демо полей и метаданных
 
 ## Файлы
 
 | Файл | Назначение |
 |------|------------|
-| `fields-demo.md` | Исходник с front matter, таблицами полей и directives |
+| `fields-demo.md` | Исходник с front matter, таблицами полей и директивами |
 | `fields-demo.docx` | Сгенерированный DOCX |
 
 ## Пересборка

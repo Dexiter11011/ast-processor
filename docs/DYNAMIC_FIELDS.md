@@ -1,22 +1,22 @@
-# Dynamic DOCX Fields
+# Динамические поля DOCX
 
-Iteration 19 adds semantic dynamic Word fields separate from template placeholders and document metadata.
+Итерация 19 добавляет семантические динамические поля Word, отдельные от плейсхолдеров шаблона и метаданных документа.
 
-## Three mechanisms
+## Три механизма
 
-| Mechanism | Example | Behavior |
+| Механизм | Пример | Поведение |
 |-----------|---------|----------|
-| Static placeholder | `{{title}}` | Replaced with static text during template merge |
-| Document property | `dc:title` in `docProps/core.xml` | Package metadata |
-| Dynamic field | `PAGE`, `TITLE`, `REF` | Word recalculates when the document opens |
+| Static placeholder | `{{title}}` | Заменяется статическим текстом при слиянии шаблона |
+| Document property | `dc:title` in `docProps/core.xml` | Метаданные пакета |
+| Dynamic field | `PAGE`, `TITLE`, `REF` | Word пересчитывает при открытии документа |
 
-`DocumentContext.title` can feed `{{title}}`, `dc:title`, and a `TITLE` field, but they are not the same mechanism. All three read from the same resolved metadata value — see [`DOCUMENT_METADATA.md`](DOCUMENT_METADATA.md).
+`DocumentContext.title` может питать `{{title}}`, `dc:title` и поле `TITLE`, но это не один и тот же механизм. Все три читают из одного и того же разрешённого значения метаданных — см. [`DOCUMENT_METADATA.md`](DOCUMENT_METADATA.md).
 
-`DocumentContext.date` is static metadata for template placeholders only. The Word `DATE` field is dynamic and independent.
+`DocumentContext.date` — статические метаданные только для плейсхолдеров шаблона. Поле Word `DATE` динамическое и независимое.
 
-## Supported fields
+## Поддерживаемые поля
 
-| Field | Status | OOXML form |
+| Поле | Статус | Форма OOXML |
 |-------|--------|------------|
 | `PAGE` | supported | `w:fldSimple` |
 | `NUMPAGES` | supported | `w:fldSimple` |
@@ -29,7 +29,7 @@ Iteration 19 adds semantic dynamic Word fields separate from template placeholde
 | List of Figures | supported | complex field (`TOC \h \z \c "Figure"`) — programmatic AST only |
 | List of Tables | supported | complex field (`TOC \h \z \c "Table"`) — programmatic AST only |
 
-## Markdown directives
+## Директивы Markdown
 
 ```markdown
 <!-- footer: page-numbers -->
@@ -42,9 +42,9 @@ Iteration 19 adds semantic dynamic Word fields separate from template placeholde
 <!-- toc -->
 ```
 
-These use the existing header/footer pipeline and emit real Word fields.
+Они используют существующий конвейер колонтитулов и генерируют настоящие поля Word.
 
-## Architecture
+## Архитектура
 
 ```text
 DynamicField
@@ -58,11 +58,11 @@ md2docx.ooxml.api
 document.xml / header/footer parts
 ```
 
-Handlers must not emit raw `w:fldSimple`, `w:fldChar`, or `w:instrText`.
+Обработчики не должны генерировать сырые `w:fldSimple`, `w:fldChar` или `w:instrText`.
 
-## Settings
+## Настройки
 
-When a document contains dynamic fields, the writer emits `word/settings.xml` with:
+Когда документ содержит динамические поля, writer генерирует `word/settings.xml` с:
 
 ```xml
 <w:updateFields w:val="true"/>
@@ -75,10 +75,10 @@ md2docx input.md --update-fields
 md2docx input.md --no-update-fields
 ```
 
-Default: update fields on open when the document contains dynamic fields.
+По умолчанию: обновлять поля при открытии, когда документ содержит динамические поля.
 
-## Runtime evaluation
+## Вычисление во время выполнения
 
-Dynamic fields are generated for WordprocessingML. Their displayed result is recalculated by Microsoft Word or LibreOffice when the document opens or fields are updated. The CLI does not evaluate field results.
+Динамические поля генерируются для WordprocessingML. Их отображаемый результат пересчитывается Microsoft Word или LibreOffice при открытии документа или обновлении полей. CLI не вычисляет результаты полей.
 
-See also [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) for static template placeholders and [`FIGURES_AND_REFERENCES.md`](FIGURES_AND_REFERENCES.md) for figure/table captions using SEQ and REF. See [`NAVIGATION.md`](NAVIGATION.md) for List of Figures/Tables and navigation registry.
+См. также [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) для статических плейсхолдеров шаблона и [`FIGURES_AND_REFERENCES.md`](FIGURES_AND_REFERENCES.md) для подписей рисунков/таблиц с SEQ и REF. См. [`NAVIGATION.md`](NAVIGATION.md) для списков рисунков/таблиц и реестра навигации.

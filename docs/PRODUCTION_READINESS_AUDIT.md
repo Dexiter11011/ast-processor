@@ -1,79 +1,79 @@
-# Production Readiness Audit
+# Аудит готовности к production
 
-Audit of the md2docx Markdown → DOCX pipeline. **No new Markdown elements** were added.
+Аудит pipeline Markdown → DOCX в md2docx. **Новые элементы Markdown не добавлялись.**
 
-## Before
+## До
 
-| Metric | Value |
-|--------|-------|
-| Tests | 200 passed |
-| Handlers | 16 registered |
-| Markdown fixtures | 24 |
-| DOCX validator | present (10 categories) |
-| CLI `--validate` | not present |
-| Missing image | silent skip |
-| Path security | `../` allowed |
-| AST JSON fixtures | none |
-| Performance baseline | none |
+| Метрика | Значение |
+|---------|----------|
+| Тесты | 200 passed |
+| Обработчики | 16 зарегистрировано |
+| Markdown-фикстуры | 24 |
+| Валидатор DOCX | присутствует (10 категорий) |
+| CLI `--validate` | отсутствует |
+| Отсутствующее изображение | тихий пропуск |
+| Безопасность путей | `../` разрешён |
+| AST JSON-фикстуры | отсутствуют |
+| Базовая линия производительности | отсутствует |
 
-## Changes
+## Изменения
 
-1. **`md2docx --validate`** — convert then run `validate_docx()`; exit 2 on failure
-2. **Image errors** — `ImageNotFoundError` / `ImagePathError`; fail fast; path sandbox under `source_dir`
-3. **AST JSON fixtures** — `tests/fixtures/ast/*.md` + `*.ast.json` + parser snapshot tests
-4. **Handler tests** — `list_item`, `table_row`, `table_cell` dedicated unit tests
-5. **Audit integration tests** — nested formatting, lists, links, images (PNG/JPEG/dual), tables, malformed input, unicode
-6. **LibreOffice gate** — optional headless DOCX→PDF test (skip if not installed)
-7. **Architecture tests** — ooxml/validation layer import guards extended
-8. **Performance baseline** — `scripts/benchmark.py` → `out/BENCHMARK.md`
-9. **Documentation** — README (Testing, Supported Markdown, Known limitations, Word checklist), `docs/TEST_MATRIX.md`
+1. **`md2docx --validate`** — конвертация, затем запуск `validate_docx()`; код выхода 2 при сбое
+2. **Ошибки изображений** — `ImageNotFoundError` / `ImagePathError`; fail fast; песочница путей под `source_dir`
+3. **AST JSON-фикстуры** — `tests/fixtures/ast/*.md` + `*.ast.json` + снимочные тесты парсера
+4. **Тесты обработчиков** — отдельные unit-тесты для `list_item`, `table_row`, `table_cell`
+5. **Интеграционные аудит-тесты** — вложенное форматирование, списки, ссылки, изображения (PNG/JPEG/dual), таблицы, некорректный ввод, unicode
+6. **Ворота LibreOffice** — опциональный headless-тест DOCX→PDF (пропуск, если не установлен)
+7. **Architecture-тесты** — расширены import guards для слоя ooxml/validation
+8. **Базовая линия производительности** — `scripts/benchmark.py` → `out/BENCHMARK.md`
+9. **Документация** — README (Testing, Supported Markdown, Known limitations, Word checklist), `docs/TEST_MATRIX.md`
 
-## Tests
+## Тесты
 
-| | Before | After |
-|---|--------|-------|
-| Total | 200 | **238** |
+| | До | После |
+|---|-----|-------|
+| Всего | 200 | **238** |
 
-## Validation
+## Валидация
 
-| Check | Status |
-|-------|--------|
-| ZIP | PASS (all fixtures + `--validate`) |
+| Проверка | Статус |
+|----------|--------|
+| ZIP | PASS (все фикстуры + `--validate`) |
 | XML | PASS |
 | Relationships | PASS |
 | Content Types | PASS |
-| Unicode | PASS (`unicode.md` fixture) |
-| Images | PASS (PNG, JPEG, dual; missing → error) |
+| Unicode | PASS (фикстура `unicode.md`) |
+| Images | PASS (PNG, JPEG, dual; отсутствие → ошибка) |
 | Lists | PASS (audit + ordered restart) |
 | Tables | PASS |
 | Nested formatting | PASS |
 
 ## LibreOffice
 
-SKIPPED unless `libreoffice` / `soffice` is on PATH — see `tests/integration/test_libreoffice_compat.py`.
+SKIPPED, если `libreoffice` / `soffice` не в PATH — см. `tests/integration/test_libreoffice_compat.py`.
 
-## Performance
+## Производительность
 
-| Size | parse | process | package | total | peak MB |
-|------|-------|---------|---------|-------|---------|
+| Размер | parse | process | package | total | peak MB |
+|--------|-------|---------|---------|-------|---------|
 | 10 KB | 0.009s | 0.001s | 0.002s | 0.012s | 0.4 |
 | 100 KB | 0.078s | 0.005s | 0.002s | 0.084s | 0.6 |
 | 1 MB | 0.584s | 0.030s | 0.008s | 0.623s | 6.8 |
 
-Run: `python scripts/benchmark.py`
+Запуск: `python scripts/benchmark.py`
 
-## Remaining Risks
+## Оставшиеся риски
 
-1. Microsoft Word compatibility not automated — manual checklist required
-2. Malformed markdown (unclosed emphasis) accepts parser output without strict spec compliance
-3. No lint/typecheck in CI (ruff/mypy not configured)
-4. Golden snapshots omit `integration-article` / `all-iterations` (large files; validated structurally instead)
+1. Совместимость с Microsoft Word не автоматизирована — требуется ручной чеклист
+2. Некорректный markdown (незакрытое выделение) принимает вывод парсера без строгого соответствия спецификации
+3. Нет lint/typecheck в CI (ruff/mypy не настроены)
+4. Golden-снимки не включают `integration-article` / `all-iterations` (большие файлы; валидируются структурно)
 
-## Known Limitations
+## Известные ограничения
 
-See README § Known limitations. Footnotes, HTML, task lists, etc. remain out of scope.
+См. README § Known limitations. Сноски, HTML, task lists и т. д. остаются вне области.
 
-## Quality gate
+## Ворота качества
 
 ```bash
 pytest -q                         # 238 passed
@@ -81,4 +81,4 @@ python scripts/validate-docx.py --fixtures
 python scripts/benchmark.py
 ```
 
-Lint/typecheck: not configured (documented gap).
+Lint/typecheck: не настроен (задокументированный пробел).

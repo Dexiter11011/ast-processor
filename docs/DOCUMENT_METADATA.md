@@ -1,10 +1,10 @@
-# Document Metadata
+# Метаданные документа
 
-Unified document metadata flow for md2docx.
+Единый поток метаданных документа для md2docx.
 
-## Overview
+## Обзор
 
-All document metadata resolves to a single canonical object:
+Все метаданные документа разрешаются в один канонический объект:
 
 ```text
 CLI + front matter + defaults
@@ -17,19 +17,19 @@ ResolvedDocumentMetadata
         └── TITLE / AUTHOR field cached display (Word reads core props at open)
 ```
 
-## Source precedence
+## Приоритет источников
 
-Per field, highest priority wins:
+Для каждого поля побеждает источник с наивысшим приоритетом:
 
 ```text
 CLI  >  front matter  >  defaults
 ```
 
-Template DOCX files do **not** provide metadata defaults. Pre-existing template `docProps` are preserved only when no resolved core-property values are supplied.
+Файлы шаблонов DOCX **не** задают значения метаданных по умолчанию. Существующие `docProps` шаблона сохраняются только когда не переданы разрешённые значения основных свойств.
 
-## Supported fields
+## Поддерживаемые поля
 
-| Field | Front matter | CLI | Placeholder | Core property |
+| Поле | Front matter | CLI | Placeholder | Core property |
 |-------|--------------|-----|-------------|---------------|
 | title | yes | `--title` | `{{title}}` | `dc:title` |
 | author | yes | `--author` | `{{author}}` | `dc:creator` |
@@ -37,9 +37,9 @@ Template DOCX files do **not** provide metadata defaults. Pre-existing template 
 | subject | yes | `--subject` | `{{subject}}` | `dc:subject` |
 | keywords | yes | `--keywords` | `{{keywords}}` | `cp:keywords` |
 
-Keywords accept comma-separated values in front matter or CLI.
+Ключевые слова принимаются в виде значений через запятую во front matter или в CLI.
 
-## Front matter
+## Front matter (YAML)
 
 ```markdown
 ---
@@ -51,11 +51,11 @@ keywords: markdown, docx
 ---
 ```
 
-Supported keys: `title`, `author`, `date`, `subject`, `keywords`.
+Поддерживаемые ключи: `title`, `author`, `date`, `subject`, `keywords`.
 
-Configuration keys such as `theme:` and `template:` are ignored by the metadata parser.
+Ключи конфигурации, такие как `theme:` и `template:`, парсером метаданных игнорируются.
 
-Empty or whitespace-only values normalize to unset (`None`).
+Пустые значения или значения, состоящие только из пробелов, нормализуются в «не задано» (`None`).
 
 ## CLI
 
@@ -69,47 +69,47 @@ md2docx README.md \
   -o README.docx
 ```
 
-CLI overrides front matter independently per field:
+CLI переопределяет front matter независимо для каждого поля:
 
 | Front matter | CLI | Result |
 |--------------|-----|--------|
 | title = A | `--title B` | title = B |
 | author = Ivan | (none) | author = Ivan |
 
-## Static date vs Word DATE field
+## Статическая дата vs поле Word DATE
 
-| Mechanism | Behavior |
+| Механизм | Поведение |
 |-----------|----------|
-| `date` metadata / `{{date}}` | Static value from CLI or front matter |
-| Word `DATE` field | Dynamic; uses Word's date at field update |
-| `dcterms:created` / `modified` | Package timestamps (explicit in tests; UTC now in production) |
+| `date` metadata / `{{date}}` | Статическое значение из CLI или front matter |
+| Word `DATE` field | Динамическое; использует дату Word при обновлении поля |
+| `dcterms:created` / `modified` | Временные метки пакета (явно в тестах; UTC now в production) |
 
-Do not treat metadata `date` as the Word `DATE` field.
+Не следует рассматривать метаданные `date` как поле Word `DATE`.
 
-## Dynamic fields
+## Динамические поля
 
-| Field | Resolves from |
+| Поле | Разрешается из |
 |-------|---------------|
-| `TITLE` | `dc:title` in core properties |
-| `AUTHOR` | `dc:creator` in core properties |
-| `DATE` | Word system date (not metadata) |
+| `TITLE` | `dc:title` в основных свойствах |
+| `AUTHOR` | `dc:creator` в основных свойствах |
+| `DATE` | Системная дата Word (не метаданные) |
 
-Cached field display text uses resolved title/author when available.
+Кэшированный текст отображения полей использует разрешённые title/author, когда они доступны.
 
-## Architecture
+## Архитектура
 
-| Component | Responsibility |
+| Компонент | Ответственность |
 |-----------|----------------|
-| `MetadataResolver` | Precedence, normalization (no OOXML) |
-| `ResolvedDocumentMetadata` | Canonical resolved state |
-| `DocumentContext` | Template placeholder view of resolved metadata |
-| `build_core_props_xml` | Serialize resolved metadata to OOXML |
-| `TemplateComposer` | Replace placeholders (no precedence logic) |
-| `CLI` | Collect raw inputs only |
+| `MetadataResolver` | Приоритет, нормализация (без OOXML) |
+| `ResolvedDocumentMetadata` | Каноническое разрешённое состояние |
+| `DocumentContext` | Представление разрешённых метаданных для плейсхолдеров шаблона |
+| `build_core_props_xml` | Сериализация разрешённых метаданных в OOXML |
+| `TemplateComposer` | Замена плейсхолдеров (без логики приоритетов) |
+| `CLI` | Сбор только сырых входных данных |
 
-## Examples
+## Примеры
 
 - [`examples/markdown/metadata.md`](../examples/markdown/metadata.md)
 - [`tests/fixtures/metadata-full.md`](../tests/fixtures/metadata-full.md)
 
-See also [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) for field directives.
+См. также [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) для директив полей.

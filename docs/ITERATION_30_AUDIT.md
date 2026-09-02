@@ -1,63 +1,63 @@
-# Iteration 30 — Phase 1 Audit
+# Iteration 30 — Аудит фазы 1
 
-Read-only audit validated against the codebase post Iteration 28 (710 pytest, 75 architecture, 62 golden, validate-docx PASS).
+Read-only аудит, проверенный по кодовой базе после Iteration 28 (710 pytest, 75 architecture, 62 golden, validate-docx PASS).
 
-## CLI entrypoint
+## Точка входа CLI
 
-- Module: `md2docx/cli/main.py`
-- Exit owner: `main()` returns int; `sys.exit` only in `__main__`
-- Error format: `Error: {message}` on stderr via `_error()`
+- Модуль: `md2docx/cli/main.py`
+- Владелец кода выхода: `main()` возвращает int; `sys.exit` только в `__main__`
+- Формат ошибки: `Error: {message}` в stderr через `_error()`
 
-## Exit codes (current)
+## Коды выхода (текущие)
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Missing input file |
-| 2 | Theme/template/plugin preload failure, conversion error, validation failure, OSError |
+| Код | Значение |
+|-----|----------|
+| 0 | Успех |
+| 1 | Отсутствует входной файл |
+| 2 | Сбой предзагрузки темы/шаблона/плагина, ошибка конвертации, сбой валидации, OSError |
 
-## Exception handling
+## Обработка исключений
 
-- 15+ typed `except` blocks in `main()` before Iteration 30
-- No catch-all for unexpected errors (traceback in normal mode)
-- Not handled: `NavigationError`, `SemanticError`, `FootnoteError` (runtime)
+- 15+ типизированных блоков `except` в `main()` до Iteration 30
+- Нет catch-all для неожиданных ошибок (traceback в обычном режиме)
+- Не обрабатываются: `NavigationError`, `SemanticError`, `FootnoteError` (runtime)
 
-## Output writing
+## Запись вывода
 
-- `DocxPackageWriter._write_zip` writes directly to final path via `path.write_bytes()`
-- No temporary file or atomic replace
-- `--validate` runs after final write; corrupt output can remain on disk
-- `output_path.parent.mkdir(parents=True, exist_ok=True)` auto-creates parent dirs
+- `DocxPackageWriter._write_zip` записывает напрямую в итоговый путь через `path.write_bytes()`
+- Нет временного файла или атомарной замены
+- `--validate` выполняется после финальной записи; повреждённый вывод может остаться на диске
+- `output_path.parent.mkdir(parents=True, exist_ok=True)` автоматически создаёт родительские каталоги
 
-## Input/output validation gaps
+## Пробелы валидации ввода/вывода
 
-- Input directory reported as "does not exist" (not "not a file")
-- Output directory not rejected pre-flight
-- Same input/output path not rejected
-- Overwrite on success: allowed (preserved)
+- Каталог на входе сообщается как «does not exist» (а не «not a file»)
+- Каталог на выходе не отклоняется на этапе pre-flight
+- Одинаковый путь ввода/вывода не отклоняется
+- Перезапись при успехе: разрешена (сохранена)
 
-## Error hierarchies
+## Иерархии ошибок
 
-| Domain | Base | Stable `code` |
-|--------|------|---------------|
-| Plugin | `PluginError` | Yes |
-| Semantic | `SemanticError` | Yes |
-| Theme | `ThemeError` | No |
-| Template | `TemplateError` | No |
-| Parser | `*ParseError` | No (line/path attrs) |
-| Processor | various | No |
+| Домен | Базовый класс | Стабильный `code` |
+|-------|---------------|-------------------|
+| Plugin | `PluginError` | Да |
+| Semantic | `SemanticError` | Да |
+| Theme | `ThemeError` | Нет |
+| Template | `TemplateError` | Нет |
+| Parser | `*ParseError` | Нет (атрибуты line/path) |
+| Processor | различные | Нет |
 
-## Resource lifecycle
+## Жизненный цикл ресурсов
 
-- Template reader: `with ZipFile` — OK
-- Plugin loader: partial registry on mid-loop failure (not transactional)
-- No logging module in md2docx core
+- Читатель шаблона: `with ZipFile` — OK
+- Загрузчик плагинов: частичный реестр при сбое в середине цикла (не транзакционный)
+- В ядре md2docx нет модуля логирования
 
-## Iteration 30 targets
+## Цели Iteration 30
 
-1. Unified CLI exception boundary with `--debug`
-2. Atomic output writer (temp → validate → replace)
-3. Pre-flight I/O validation
-4. Transactional plugin loading
-5. Contract tests for exit codes, atomicity, recovery
+1. Единая граница исключений CLI с `--debug`
+2. Атомарный writer вывода (temp → validate → replace)
+3. Pre-flight валидация ввода-вывода
+4. Транзакционная загрузка плагинов
+5. Контрактные тесты для кодов выхода, атомарности, восстановления
 6. ERROR_HANDLING.md + RELEASE_READINESS.md

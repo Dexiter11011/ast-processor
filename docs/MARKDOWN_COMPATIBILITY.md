@@ -1,76 +1,76 @@
-# Markdown Compatibility
+# Совместимость с Markdown
 
-Boundary between **markdown-it parser capability** and **md2docx rendering capability**.
+Граница между **возможностями парсера markdown-it** и **возможностями рендеринга md2docx**.
 
-## Supported
+## Поддерживается
 
-| Feature | Markdown | Notes |
-|---------|----------|-------|
-| Headings | `#`–`###` | Heading styles + bookmarks |
+| Функция | Markdown | Примечания |
+|---------|----------|------------|
+| Headings | `#`–`###` | Стили заголовков + закладки |
 | Paragraphs | plain text | |
 | Bold / italic | `**`, `*`, nested | RenderContext |
-| Strikethrough | `~~text~~` | `w:strike` via RenderContext |
-| Inline code | `` ` `` | Code character style |
-| Fenced code | ` ``` ` | NoSpacing style |
-| Links | `[text](url)` | External rel or internal anchor |
-| Autolinks | `<https://...>` | Same Link pipeline |
-| Reference links | `[t][id]` + `[id]: url` | Same Link pipeline |
+| Strikethrough | `~~text~~` | `w:strike` через RenderContext |
+| Inline code | `` ` `` | Стиль символов Code |
+| Fenced code | ` ``` ` | Стиль NoSpacing |
+| Links | `[text](url)` | Внешняя rel или внутренний якорь |
+| Autolinks | `<https://...>` | Тот же pipeline Link |
+| Reference links | `[t][id]` + `[id]: url` | Тот же pipeline Link |
 | Images | `![alt](path)` | |
 | Bullet / ordered lists | `-`, `1.` | Numbering.xml |
-| Task lists | `- [ ]`, `- [x]` | Checkbox glyph prefix (not Word controls) |
+| Task lists | `- [ ]`, `- [x]` | Префикс символом checkbox (не элементы управления Word) |
 | Nested lists | indent | |
 | Blockquote | `>` | |
 | Horizontal rule | `---` | |
 | GFM tables | `\|...\|` | TableGrid, merges, directives |
-| Hard line break | two spaces + newline, `\` | `w:br` inside paragraph |
+| Hard line break | two spaces + newline, `\` | `w:br` внутри абзаца |
 | Footnotes | `[^label]`, `[^label]: body` | `footnotes.xml`, `w:footnoteReference` |
-| Definition lists | `Term` + `: Definition` | styled paragraphs |
-| Safe inline HTML | `<strong>`, `<em>`, `<del>`, `<br>`, `<a href="https://...">` | mapped to existing AST nodes |
-| Escaped punctuation | `\*`, `\#`, etc. | Parser escape rule |
+| Definition lists | `Term` + `: Definition` | стилизованные абзацы |
+| Safe inline HTML | `<strong>`, `<em>`, `<del>`, `<br>`, `<a href="https://...">` | сопоставлены с существующими узлами AST |
+| Escaped punctuation | `\*`, `\#`, etc. | Правило escape парсера |
 | Unicode | any UTF-8 | |
 | YAML front matter | `---` header | docProps |
-| TOC | `<!-- toc -->`, `<!-- toc: 2-3 -->` | Word TOC field |
+| TOC | `<!-- toc -->`, `<!-- toc: 2-3 -->` | Поле TOC Word |
 | List of figures | `<!-- lof -->` | Word `TOC \c "Figure"` |
 | List of tables | `<!-- lot -->` | Word `TOC \c "Table"` |
 | Figure caption | `![alt](path)` + `<!-- caption: figure ... -->` | SEQ + bookmark |
 | Table caption | `<!-- caption: table ... -->` + GFM table | SEQ + bookmark |
-| Figure/table ref | `<!-- ref: figure slug -->`, `<!-- ref: table slug -->` | REF field |
+| Figure/table ref | `<!-- ref: figure slug -->`, `<!-- ref: table slug -->` | Поле REF |
 | Heading ref | `[text](#slug)`, `<!-- field: ref slug -->` | hyperlink / REF |
 | Page/section breaks | HTML comment directives | |
 
-See [`MARKDOWN_NAVIGATION_DSL.md`](MARKDOWN_NAVIGATION_DSL.md) for caption and cross-reference syntax.
-See [`ADVANCED_MARKDOWN.md`](ADVANCED_MARKDOWN.md) for footnotes, definition lists, and safe HTML.
+См. [`MARKDOWN_NAVIGATION_DSL.md`](MARKDOWN_NAVIGATION_DSL.md) для синтаксиса подписей и перекрёстных ссылок.
+См. [`ADVANCED_MARKDOWN.md`](ADVANCED_MARKDOWN.md) для сносок, списков определений и безопасного HTML.
 
-## Partially supported
+## Частично поддерживается
 
-| Feature | Behavior |
-|---------|----------|
-| Navigation caption text | Plain string in HTML comment — no rich inline markdown |
-| Standalone images only | Inline `![...](...)` inside a paragraph is not coalesced into `Figure` |
+| Функция | Поведение |
+|---------|-----------|
+| Текст подписи навигации | Простая строка в HTML-комментарии — без rich inline markdown |
+| Только отдельные изображения | Inline `![...](...)` внутри абзаца не объединяется в `Figure` |
 
-| Feature | Behavior |
-|---------|----------|
-| Soft break (single `\n` in paragraph) | AST `Text("\n")` — not `w:br`; CommonMark inline newline |
+| Функция | Поведение |
+|---------|-----------|
+| Soft break (один `\n` в абзаце) | AST `Text("\n")` — не `w:br`; inline newline CommonMark |
 
-## Not supported
+## Не поддерживается
 
-| Feature | Reason |
-|---------|--------|
-| Bare URL autolink (`https://...` without `<>`) | linkify extension disabled |
-| Unsafe / block HTML | `<script>`, `<div>`, `javascript:` links rejected |
-| Inline footnotes `^[text]` | optional; not covered by current tests |
-| Word interactive checkboxes | task items use Unicode glyphs |
-| Math, diagrams | out of scope |
+| Функция | Причина |
+|---------|---------|
+| Bare URL autolink (`https://...` without `<>`) | расширение linkify отключено |
+| Unsafe / block HTML | `<script>`, `<div>`, ссылки `javascript:` отклоняются |
+| Inline footnotes `^[text]` | необязательно; не покрыто текущими тестами |
+| Word interactive checkboxes | элементы task list используют символы Unicode |
+| Math, diagrams | вне области |
 
-## Architecture
+## Архитектура
 
 ```text
 Markdown syntax → Parser → AST → Handler → OOXML API → DOCX
 ```
 
-GFM features must not bypass this stack. No Markdown parsing in handlers or OOXML layer.
+GFM-функции не должны обходить этот стек. Парсинг Markdown в обработчиках или слое OOXML не выполняется.
 
-## Parser configuration
+## Конфигурация парсера
 
 ```python
 MarkdownIt("commonmark", {"html": True})
@@ -80,4 +80,4 @@ MarkdownIt("commonmark", {"html": True})
     .use(deflist_plugin)
 ```
 
-Task list state is detected in a post-processing pass on `ListItem` nodes (markdown-it-py has no task-list rule).
+Состояние task list определяется в постобработке узлов `ListItem` (у markdown-it-py нет правила task-list).

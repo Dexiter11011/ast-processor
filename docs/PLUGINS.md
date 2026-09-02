@@ -1,8 +1,8 @@
-# Plugins
+# Плагины
 
-md2docx supports trusted Python plugins that extend the conversion pipeline through a public API.
+md2docx поддерживает доверенные Python-плагины, расширяющие pipeline конвертации через публичный API.
 
-## Quick start
+## Быстрый старт
 
 ```bash
 md2docx README.md \
@@ -10,7 +10,7 @@ md2docx README.md \
   -o README.docx
 ```
 
-Multiple plugins load in CLI order:
+Несколько плагинов загружаются в порядке аргументов CLI:
 
 ```bash
 md2docx README.md \
@@ -19,17 +19,17 @@ md2docx README.md \
   -o README.docx
 ```
 
-## Security
+## Безопасность
 
-Loading a plugin executes Python code in the current process with the same OS and user permissions as `md2docx`. Plugins are **not** sandboxed.
+Загрузка плагина выполняет Python-код в текущем процессе с теми же правами ОС и пользователя, что и у `md2docx`. Плагины **не** изолированы в песочнице.
 
-- Plugins load only from explicit `--plugin PATH` arguments (or programmatic API).
-- Markdown content cannot load plugins (`<!-- plugin: ... -->` has no effect).
-- Do not load untrusted plugin files.
+- Плагины загружаются только из явных аргументов `--plugin PATH` (или программного API).
+- Содержимое Markdown не может загружать плагины (`<!-- plugin: ... -->` не имеет эффекта).
+- Не загружайте недоверенные файлы плагинов.
 
-## Example plugin
+## Пример плагина
 
-See [`examples/plugins/notes_plugin.py`](../examples/plugins/notes_plugin.py).
+См. [`examples/plugins/notes_plugin.py`](../examples/plugins/notes_plugin.py).
 
 Markdown:
 
@@ -37,29 +37,29 @@ Markdown:
 <!-- note: Important -->
 ```
 
-DOCX output:
+Вывод DOCX:
 
 ```text
 Note: Important
 ```
 
-The same plugin registers:
+Тот же плагин регистрирует:
 
-- a custom AST node and handler
-- a semantic style (`example.notes.note` → `ExampleNote`)
-- a template region (`{{example_note}}`)
-- a semantic validator (non-empty note text)
+- пользовательский узел AST и обработчик
+- семантический стиль (`example.notes.note` → `ExampleNote`)
+- регион шаблона (`{{example_note}}`)
+- семантический валидатор (непустой текст заметки)
 
-## Documentation
+## Документация
 
-- [`PLUGIN_API.md`](PLUGIN_API.md) — public extension API reference
-- [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) — template placeholders and regions
+- [`PLUGIN_API.md`](PLUGIN_API.md) — справочник публичного API расширений
+- [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) — плейсхолдеры и регионы шаблона
 
-## Unsupported in v1
+## Не поддерживается в v1
 
-- Arbitrary raw OOXML generation through the plugin API
-- ZIP / package map access
-- Remote plugin download
-- Plugin dependency resolution
-- Template scripting or loops
-- Markdown-triggered plugin loading
+- Произвольная генерация сырого OOXML через plugin API
+- Доступ к ZIP / карте пакета
+- Удалённая загрузка плагинов
+- Разрешение зависимостей плагинов
+- Скриптование или циклы в шаблонах
+- Загрузка плагинов по триггеру из Markdown

@@ -1,44 +1,44 @@
-# Iteration 28 — Phase 1 Audit
+# Iteration 28 — Аудит фазы 1
 
-Read-only audit validated against the codebase post Iteration 27 (690 pytest, 70 architecture, 62 golden, validate-docx PASS).
+Read-only аудит, проверенный по кодовой базе после Iteration 27 (690 pytest, 70 architecture, 62 golden, validate-docx PASS).
 
-## Existing semantic abstractions
+## Существующие семантические абстракции
 
-| Layer | Module | Notes |
-|-------|--------|-------|
-| Markdown AST | `md2docx.ast.types` | Frozen dataclasses for blocks and inline nodes |
-| Caption models | `md2docx.captions.model` | `Figure`, `TableWithCaption`, `CrossReferenceBlock` (uses internal AST) |
-| Inline state | `md2docx.processor.inline_formatting` | `InlineFormatting`, `RenderContext` |
-| Style roles | `md2docx.styles.semantic` | Semantic constants resolved via `StyleManager` |
-| Metadata | `md2docx.metadata.resolved` | Frozen `ResolvedDocumentMetadata` |
-| OOXML facade | `md2docx.ooxml.api` | ~40 functions returning `lxml` elements |
-| Document accumulator | `md2docx.ooxml.document` | `OoxmlDocument.body_children` is the de facto content fragment |
+| Слой | Модуль | Примечания |
+|------|--------|------------|
+| Markdown AST | `md2docx.ast.types` | Неизменяемые dataclass для блочных и inline-узлов |
+| Модели подписей | `md2docx.captions.model` | `Figure`, `TableWithCaption`, `CrossReferenceBlock` (использует внутренний AST) |
+| Inline-состояние | `md2docx.processor.inline_formatting` | `InlineFormatting`, `RenderContext` |
+| Роли стилей | `md2docx.styles.semantic` | Семантические константы, разрешаемые через `StyleManager` |
+| Метаданные | `md2docx.metadata.resolved` | Неизменяемый `ResolvedDocumentMetadata` |
+| OOXML-фасад | `md2docx.ooxml.api` | ~40 функций, возвращающих элементы `lxml` |
+| Аккумулятор документа | `md2docx.ooxml.document` | `OoxmlDocument.body_children` — де-факто фрагмент содержимого |
 
-## Existing fragment model
+## Существующая модель фрагмента
 
-- No `DocumentFragment` or `RichDocumentFragment` class exists.
-- “Fragment” internally means `list[lxml.etree._Element]`.
-- Plugin template regions: `FragmentRenderer = Callable[[ProcessingContext], list[Element]]`.
-- Built-in handlers return `None` and mutate `ProcessingContext`.
+- Класса `DocumentFragment` или `RichDocumentFragment` не существует.
+- Внутренне «фрагмент» означает `list[lxml.etree._Element]`.
+- Регионы шаблона плагинов: `FragmentRenderer = Callable[[ProcessingContext], list[Element]]`.
+- Встроенные обработчики возвращают `None` и мутируют `ProcessingContext`.
 
-## Existing composition model
+## Существующая модель композиции
 
-- Blocks append to `OoxmlDocument.body_children`.
-- Inline content uses `run_collector` during handler recursion.
-- Template pipeline splices fragments via `TemplateCompositionPlan` and remaps IDs in `TemplateMerger`.
+- Блоки добавляются в `OoxmlDocument.body_children`.
+- Inline-содержимое использует `run_collector` во время рекурсии обработчиков.
+- Pipeline шаблонов склеивает фрагменты через `TemplateCompositionPlan` и переназначает ID в `TemplateMerger`.
 
-## Safe public candidates
+## Безопасные публичные кандидаты
 
-Styled paragraphs with rich inline, line breaks, validated hyperlinks, whitelisted fields, path/bytes images, lists (NumberingManager-owned numId), read-only metadata, fragment composition.
+Стилизованные абзацы с rich inline, разрывы строк, валидированные гиперссылки, поля из белого списка, изображения path/bytes, списки (numId принадлежит NumberingManager), метаданные только для чтения, композиция фрагментов.
 
-## Unsafe internals
+## Небезопасные внутренние части
 
-`md2docx.ast.*`, `ProcessingContext`/`AstProcessor` imports, collectors, raw lxml, numId/rId assignment, arbitrary field instructions, direct package access.
+Импорты `md2docx.ast.*`, `ProcessingContext`/`AstProcessor`, коллекторы, сырой lxml, назначение numId/rId, произвольные инструкции полей, прямой доступ к пакету.
 
-## Gaps
+## Пробелы
 
-Plugins must assemble OOXML via Tier B `ooxml.api`; no inline composition API; bookmarks/fields/media/lists/captions require undocumented managers.
+Плагины должны собирать OOXML через Tier B `ooxml.api`; нет API inline-композиции; закладки/поля/медиа/списки/подписи требуют недокументированных менеджеров.
 
-## Recommended Rich Semantic API
+## Рекомендуемый Rich Semantic API
 
-New Tier B module `md2docx.semantic` with immutable semantic value types, `SemanticContext` facade, internal `SemanticRenderer` adapter. Handlers may return `RichDocumentFragment` (backward compatible with void/OOXML paths). Tables deferred in v1.
+Новый модуль Tier B `md2docx.semantic` с неизменяемыми семантическими типами значений, фасадом `SemanticContext`, внутренним адаптером `SemanticRenderer`. Обработчики могут возвращать `RichDocumentFragment` (обратно совместимо с void/OOXML-путями). Таблицы отложены в v1.

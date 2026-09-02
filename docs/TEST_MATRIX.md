@@ -1,8 +1,8 @@
-# Test Matrix
+# Матрица тестов
 
-Coverage by layer for supported Markdown features. Updated during Production Readiness Audit.
+Покрытие по слоям для поддерживаемых функций Markdown. Обновлено в ходе Production Readiness Audit.
 
-| Feature | Parser | AST fixture | Handler | OOXML | Package validate | Integration |
+| Функция | Parser | AST fixture | Handler | OOXML | Package validate | Integration |
 |---------|--------|-------------|---------|-------|------------------|-------------|
 | paragraph | yes | yes | yes | yes | yes | yes |
 | heading | yes | yes | yes | yes | yes | yes |
@@ -55,13 +55,13 @@ Coverage by layer for supported Markdown features. Updated during Production Rea
 | theme switching | n/a | n/a | yes | yes | yes | yes |
 | golden theme styles.xml | n/a | n/a | n/a | yes | n/a | 2 themes |
 
-## Not supported (by design)
+## Не поддерживается (по замыслу)
 
 footnotes, definition lists, raw HTML, bare URL linkify.
 
-See [`docs/MARKDOWN_COMPATIBILITY.md`](docs/MARKDOWN_COMPATIBILITY.md) for the full matrix.
+См. [`docs/MARKDOWN_COMPATIBILITY.md`](docs/MARKDOWN_COMPATIBILITY.md) для полной матрицы.
 
-## Test commands
+## Команды тестирования
 
 ```bash
 pytest -q

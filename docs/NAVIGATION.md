@@ -1,8 +1,8 @@
-# Iteration 21 — Document Navigation
+# Итерация 21 — Навигация по документу
 
-Advanced document navigation layer: semantic targets, template bookmark remapping, TOC hardening, List of Figures / List of Tables, and typed cross-reference validation.
+Расширенный слой навигации по документу: семантические цели, переназначение закладок шаблона, усиление оглавления, списки рисунков / списки таблиц и типизированная проверка перекрёстных ссылок.
 
-## Architecture
+## Архитектура
 
 ```text
                          Document Navigation
@@ -22,20 +22,20 @@ Advanced document navigation layer: semantic targets, template bookmark remappin
              TOC             List of Figures     List of Tables
 ```
 
-## Separation of concerns
+## Разделение ответственности
 
-| Component | Responsibility | Must NOT know |
-|-----------|---------------|---------------|
-| `NavigationRegistry` | Semantic targets, document order, kinds | Raw XML, numId, rId |
-| `BookmarkManager` | Create/own anchors (name + id) | TOC, LOF, LOT semantics |
-| `ReferenceManager` | Resolve target → bookmark; validate kind | OOXML, Markdown |
-| `FieldManager` | Render REF/TOC/SEQ/LOF/LOT fields | Markdown, navigation semantics |
-| `TemplateMerger` | ID + name remapping infrastructure | Figure/Table semantics |
-| `SequenceManager` | Sequence identity labels | NavigationRegistry internals |
+| Компонент | Ответственность | Не должен знать |
+|-----------|-----------------|-----------------|
+| `NavigationRegistry` | Семантические цели, порядок в документе, виды | Сырой XML, numId, rId |
+| `BookmarkManager` | Создание/владение якорями (имя + id) | Семантику TOC, LOF, LOT |
+| `ReferenceManager` | Разрешение цели → закладка; проверка вида | OOXML, Markdown |
+| `FieldManager` | Рендеринг полей REF/TOC/SEQ/LOF/LOT | Markdown, семантику навигации |
+| `TemplateMerger` | Инфраструктура переназначение ID и имён | Семантику Figure/Table |
+| `SequenceManager` | Метки идентичности последовательности | Внутренности NavigationRegistry |
 
 ## NavigationRegistry
 
-Stores `NavigationTarget` entries in document order:
+Хранит записи `NavigationTarget` в порядке документа:
 
 ```python
 NavigationTarget(
@@ -47,36 +47,36 @@ NavigationTarget(
 )
 ```
 
-Registration points:
+Точки регистрации:
 
-- **Headings** — pre-scanned in `BookmarkManager.register_headings()` (also registers in `NavigationRegistry`)
-- **Figures / Tables** — registered in `CaptionService._render_caption()` after bookmark creation
+- **Заголовки** — предварительное сканирование в `BookmarkManager.register_headings()` (также регистрируются в `NavigationRegistry`)
+- **Рисунки / Таблицы** — регистрируются в `CaptionService._render_caption()` после создания закладки
 
-## Bookmark name policy
+## Политика имён закладок
 
-| Kind | Pattern | Example |
-|------|---------|---------|
+| Вид | Шаблон | Пример |
+|-----|--------|--------|
 | Heading | `<slug>` | `architecture` |
 | Figure | `figure-<slug>` | `figure-architecture` |
 | Table | `table-<slug>` | `table-results` |
 
-Sequence numbers are **not** included in bookmark names. Numbering is Word-side via `SEQ Figure` / `SEQ Table`.
+Номера последовательности **не** включаются в имена закладок. Нумерация выполняется на стороне Word через `SEQ Figure` / `SEQ Table`.
 
-## Template bookmark remapping
+## Перемapping закладок шаблона
 
-When merging generated content into a template:
+При слиянии сгенерированного содержимого в шаблон:
 
-1. Collect template bookmark names from `word/document.xml`
-2. Remap generated bookmark IDs (offset above template max ID)
-3. For generated names colliding with template names → rename with `-1` suffix (`architecture` → `architecture-1`)
-4. Rewrite in generated fragment only: `w:name`, REF `instrText`, `w:anchor` on hyperlinks
-5. Template bookmarks and template REF fields remain unchanged
+1. Собрать имена закладок шаблона из `word/document.xml`
+2. Переназначить ID сгенерированных закладок (смещение выше максимального ID шаблона)
+3. Для сгенерированных имён, конфликтующих с именами шаблона → переименовать с суффиксом `-1` (`architecture` → `architecture-1`)
+4. Перезаписать только во фрагменте сгенерированного содержимого: `w:name`, REF `instrText`, `w:anchor` у гиперссылок
+5. Закладки шаблона и поля REF шаблона остаются без изменений
 
-Implemented in `templates/bookmark_remap.py` via `BookmarkRemapMap`.
+Реализовано в `templates/bookmark_remap.py` через `BookmarkRemapMap`.
 
 ## ReferenceManager
 
-Typed cross-reference validation:
+Типизированная проверка перекрёстных ссылок:
 
 ```python
 # OK — figure bookmark, figure kind
@@ -87,19 +87,19 @@ CrossReference(target="table-results", kind=CaptionKind.FIGURE)
 # → ReferenceKindMismatchError
 ```
 
-Heading references use `kind=None` and `RefStyle.HEADING` (REF with `\h` only).
+Ссылки на заголовки используют `kind=None` и `RefStyle.HEADING` (REF только с `\h`).
 
-Figure/table references use `RefStyle.CAPTION` (REF with `\r \h`).
+Ссылки на рисунки/таблицы используют `RefStyle.CAPTION` (REF с `\r \h`).
 
 ## TOC
 
-Existing `TableOfContents` semantic object + Word field:
+Существующий семантический объект `TableOfContents` + поле Word:
 
 ```text
 TOC \o "{min}-{max}" \h \z \u
 ```
 
-Programmatic API:
+Программный API:
 
 ```python
 from md2docx.ast.types import TableOfContents, Document
@@ -107,9 +107,9 @@ from md2docx.ast.types import TableOfContents, Document
 Document(children=[TableOfContents(min_level=1, max_level=3), ...])
 ```
 
-## List of Figures / List of Tables
+## Список рисунков / Список таблиц
 
-Semantic AST nodes:
+Семантические узлы AST:
 
 ```python
 from md2docx.ast.types import ListOfFigures, ListOfTables
@@ -121,20 +121,20 @@ Document(children=[
 ])
 ```
 
-Word resolves captions dynamically — no static list generation in Python.
+Word разрешает подписи динамически — статическая генерация списка в Python не выполняется.
 
-## Programmatic fixtures
+## Программные фикстуры
 
-Use `convert_ast_to_docx()` with AST builders in `tests/navigation_fixtures.py` for tests without Markdown syntax.
+Используйте `convert_ast_to_docx()` со сборщиками AST в `tests/navigation_fixtures.py` для тестов без синтаксиса Markdown.
 
-## Validation
+## Проверка
 
-- `validate_navigation()` — every navigation target has a bookmark anchor
-- `ReferenceManager.validate_pending_refs()` — typed REF validation at end of conversion
-- Package validator — bookmark uniqueness, REF targets, TOC/LOF/LOT field whitelist
+- `validate_navigation()` — у каждой цели навигации есть якорь-закладка
+- `ReferenceManager.validate_pending_refs()` — типизированная проверка REF в конце конвертации
+- Валидатор пакета — уникальность закладок, цели REF, белый список полей TOC/LOF/LOT
 
-## Related docs
+## Связанные документы
 
-- [FIGURES_AND_REFERENCES.md](FIGURES_AND_REFERENCES.md) — captions, SEQ, REF
-- [DYNAMIC_FIELDS.md](DYNAMIC_FIELDS.md) — field types and security
-- [DOCX_TEMPLATES.md](DOCX_TEMPLATES.md) — template merge and bookmark remapping
+- [FIGURES_AND_REFERENCES.md](FIGURES_AND_REFERENCES.md) — подписи, SEQ, REF
+- [DYNAMIC_FIELDS.md](DYNAMIC_FIELDS.md) — типы полей и безопасность
+- [DOCX_TEMPLATES.md](DOCX_TEMPLATES.md) — слияние шаблона и переназначение закладок

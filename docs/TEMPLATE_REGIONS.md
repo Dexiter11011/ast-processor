@@ -1,10 +1,10 @@
-# Template Navigation Regions
+# Регионы навигации в шаблоне
 
-Iteration 25 adds typed template regions for navigation blocks alongside the existing `{{content}}` insertion point.
+Итерация 25 добавляет типизированные регионы шаблона для блоков навигации наряду с существующей точкой вставки `{{content}}`.
 
-## Region placeholders
+## Плейсхолдеры регионов
 
-Supported standalone paragraph placeholders:
+Поддерживаемые плейсхолдеры в отдельном абзаце:
 
 ```text
 {{content}}
@@ -18,29 +18,29 @@ Supported standalone paragraph placeholders:
 {{keywords}}
 ```
 
-Navigation regions render Word field paragraphs using the same stack as Markdown directives (`TocManager`, existing handlers). No second rendering engine is introduced.
+Регионы навигации рендерят абзацы полей Word, используя тот же стек, что и директивы Markdown (`TocManager`, существующие обработчики). Второй движок рендеринга не вводится.
 
-## Rules
+## Правила
 
-| Region | Uniqueness | Behavior |
+| Регион | Уникальность | Поведение |
 |--------|------------|----------|
-| `{{content}}` | Exactly one (required) | Full Markdown body fragment |
-| `{{toc}}` | Duplicates allowed | TOC field (levels 1–3) |
-| `{{list_of_figures}}` | Duplicates allowed | LOF field |
-| `{{list_of_tables}}` | Duplicates allowed | LOT field |
-| Scalars | Duplicates allowed | In-place text replacement |
+| `{{content}}` | Ровно один (обязательно) | Полный фрагмент тела Markdown |
+| `{{toc}}` | Дубликаты допустимы | Поле TOC (уровни 1–3) |
+| `{{list_of_figures}}` | Дубликаты допустимы | Поле LOF |
+| `{{list_of_tables}}` | Дубликаты допустимы | Поле LOT |
+| Scalars | Дубликаты допустимы | Замена текста на месте |
 
-Additional constraints:
+Дополнительные ограничения:
 
-- Placeholder must be the only text in its paragraph (split runs are OK)
-- Inline placeholders (`Project: {{title}}`) → error
-- Unknown placeholders → error
-- Header/footer regions are **not supported** in v1 (only direct `w:body` paragraphs are scanned)
-- No expressions, filters, or scripting
+- Плейсхолдер должен быть единственным текстом в своём абзаце (разделённые runs допустимы)
+- Встроенные плейсхолдеры (`Project: {{title}}`) → ошибка
+- Неизвестные плейсхолдеры → ошибка
+- Регионы в колонтитулах **не поддерживаются** в v1 (сканируются только абзацы непосредственно в `w:body`)
+- Без выражений, фильтров и скриптов
 
-## Template ordering
+## Порядок в шаблоне
 
-Regions are composed in **template document order**. A template may place navigation before or after content:
+Регионы составляются в **порядке документа шаблона**. Шаблон может разместить навигацию до или после контента:
 
 ```text
 Title:
@@ -53,21 +53,21 @@ Appendix navigation
 {{list_of_figures}}
 ```
 
-Word resolves TOC/LOF/LOT fields at open/update time against the full merged document, so navigation regions may appear before generated content in the template.
+Word разрешает поля TOC/LOF/LOT при открытии/обновлении относительно полного объединённого документа, поэтому регионы навигации могут располагаться в шаблоне до сгенерированного контента.
 
-## Dedup policy: template wins
+## Политика дедупликации: шаблон побеждает
 
-When a template contains a navigation region, matching Markdown directives are stripped from the AST **before** content rendering:
+Когда шаблон содержит регион навигации, соответствующие директивы Markdown удаляются из AST **до** рендеринга контента:
 
-| Template region | Stripped Markdown directive |
+| Регион шаблона | Удаляемая директива Markdown |
 |-----------------|----------------------------|
 | `{{toc}}` | `<!-- toc -->` / `TableOfContents` |
 | `{{list_of_figures}}` | `<!-- lof -->` / `ListOfFigures` |
 | `{{list_of_tables}}` | `<!-- lot -->` / `ListOfTables` |
 
-This prevents duplicate navigation blocks when both template and Markdown specify the same region.
+Это предотвращает дублирование блоков навигации, когда и шаблон, и Markdown задают один и тот же регион.
 
-## Architecture
+## Архитектура
 
 ```text
 Template DOCX
@@ -85,31 +85,31 @@ TemplateComposer (multi-region compose, back-to-front insertion)
 Final DOCX
 ```
 
-Key components:
+Ключевые компоненты:
 
-| Module | Role |
+| Модуль | Роль |
 |--------|------|
-| `templates/regions.py` | `TemplateRegionKind` enum |
-| `templates/placeholders.py` | `PlaceholderKind.NAVIGATION` registry |
+| `templates/regions.py` | Перечисление `TemplateRegionKind` |
+| `templates/placeholders.py` | Реестр `PlaceholderKind.NAVIGATION` |
 | `templates/composition_plan.py` | `TemplateCompositionPlan` |
-| `templates/composition.py` | Navigation fragment rendering |
-| `templates/composer.py` | Multi-region compose |
-| `parser/navigation_transform.py` | AST deduplication |
+| `templates/composition.py` | Рендеринг фрагментов навигации |
+| `templates/composer.py` | Составление нескольких регионов |
+| `parser/navigation_transform.py` | Дедупликация AST |
 
-## Backward compatibility
+## Обратная совместимость
 
-Existing templates with only `{{content}}` and scalar placeholders behave exactly as in Iteration 17/18. The `{{ content }}` form (with internal whitespace) is now accepted consistently by scan and insertion.
+Существующие шаблоны только с `{{content}}` и скалярными плейсхолдерами ведут себя точно так же, как в итерациях 17/18. Форма `{{ content }}` (с внутренними пробелами) теперь принимается согласованно при сканировании и вставке.
 
-## Building region fixtures
+## Сборка фикстур регионов
 
 ```bash
 PYTHONPATH=src python scripts/build-template-fixtures.py
 ```
 
-Creates:
+Создаёт:
 
 - `tests/fixtures/templates/regions-basic.docx` — `{{toc}}` + `{{content}}`
 - `tests/fixtures/templates/regions-navigation.docx` — TOC + LOF + LOT + `{{content}}`
-- `tests/fixtures/templates/regions-complex.docx` — scalars, content before navigation
+- `tests/fixtures/templates/regions-complex.docx` — скаляры, контент перед навигацией
 
-See also [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) and [`NAVIGATION.md`](NAVIGATION.md).
+См. также [`DOCX_TEMPLATES.md`](DOCX_TEMPLATES.md) и [`NAVIGATION.md`](NAVIGATION.md).

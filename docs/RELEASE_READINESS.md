@@ -1,44 +1,44 @@
-# Release Readiness (Iteration 30 → 31)
+# Готовность к релизу (Iteration 30 → 31)
 
-Checklist for packaging and first public release. Iteration 30 delivers production hardening; Iteration 31 covers packaging.
+Чеклист для упаковки и первого публичного релиза. Iteration 30 обеспечивает production hardening; Iteration 31 охватывает упаковку.
 
-## Completed (Iteration 30)
+## Выполнено (Iteration 30)
 
-- [x] Unified CLI error boundary (`cli/runner.py`, `cli/errors.py`, `cli/diagnostics.py`)
-- [x] Exit codes 0 / 1 / 2 preserved
-- [x] `--debug` for unexpected internal errors
-- [x] Atomic DOCX output with validate-before-replace
-- [x] Pre-flight input/output validation
-- [x] Transactional plugin loading (all plugins validated before registry mutation)
-- [x] Contract tests: exit codes, CLI errors, atomicity, recovery
-- [x] `ERROR_HANDLING.md` documentation
+- [x] Единая граница ошибок CLI (`cli/runner.py`, `cli/errors.py`, `cli/diagnostics.py`)
+- [x] Коды выхода 0 / 1 / 2 сохранены
+- [x] `--debug` для неожиданных внутренних ошибок
+- [x] Атомарный вывод DOCX с валидацией перед заменой
+- [x] Предварительная валидация ввода/вывода
+- [x] Транзакционная загрузка плагинов (все плагины валидируются до изменения реестра)
+- [x] Контрактные тесты: коды выхода, ошибки CLI, атомарность, восстановление
+- [x] Документация `ERROR_HANDLING.md`
 
-## Regression gates (baseline)
+## Регрессионные ворота (базовая линия)
 
-| Gate | Target |
-|------|--------|
+| Ворота | Целевое значение |
+|--------|------------------|
 | pytest | 710+ |
 | architecture | 75+ |
 | golden | 62 |
 | validate-docx | PASS |
 
-## Known limitations
+## Известные ограничения
 
-| Area | Limitation |
-|------|------------|
-| Process kill | SIGKILL during write may leave temp files (`.md2docx-*.tmp`) |
-| Plugin trust | Plugins execute arbitrary Python; no sandbox |
-| Template conditionals | Iteration 29 conditional regions not implemented |
-| Windows | Atomic replace tested on current platform; edge cases on locked files possible |
-| Logging | No structured logging module in core; CLI owns presentation |
+| Область | Ограничение |
+|---------|-------------|
+| Завершение процесса | SIGKILL во время записи может оставить временные файлы (`.md2docx-*.tmp`) |
+| Доверие к плагинам | Плагины выполняют произвольный Python; песочницы нет |
+| Условия в шаблонах | Условные регионы Iteration 29 не реализованы |
+| Windows | Атомарная замена протестирована на текущей платформе; возможны краевые случаи с заблокированными файлами |
+| Логирование | В ядре нет модуля структурированного логирования; CLI отвечает за представление |
 
-## Iteration 31 (packaging) — out of scope here
+## Iteration 31 (упаковка) — вне области этого документа
 
-- PyPI / wheel distribution
-- Entry point verification in clean venv
-- Version pinning policy
-- CI release workflow
+- Распространение через PyPI / wheel
+- Проверка точки входа в чистом venv
+- Политика фиксации версий
+- CI workflow релиза
 
-## API stability
+## Стабильность API
 
-Public Tier A/B API unchanged. New internal modules: `cli/runner`, `cli/diagnostics`, `cli/errors`, `output/atomic`. Not exported in the API manifest.
+Публичный API уровней A/B без изменений. Новые внутренние модули: `cli/runner`, `cli/diagnostics`, `cli/errors`, `output/atomic`. Не экспортируются в манифест API.

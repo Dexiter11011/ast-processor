@@ -1,8 +1,8 @@
-# Lists, Numbering & Table Styles
+# Списки, нумерация и стили таблиц
 
-Iteration 10 connects lists and tables to the Style System while keeping **style**, **numbering**, and **table layout** as separate concerns.
+Итерация 10 связывает списки и таблицы с системой стилей, сохраняя **стиль**, **нумерацию** и **макет таблицы** как отдельные области ответственности.
 
-## Three layers
+## Три слоя
 
 ```text
 Style System (StyleRegistry / StyleManager)
@@ -19,13 +19,13 @@ OOXML table layer (ooxml/table.py)
   → w:tblHeader on header rows
 ```
 
-Handlers decide **semantics** only (list kind, table style id). They do not emit raw OOXML.
+Обработчики решают только **семантику** (тип списка, id стиля таблицы). Они не генерируют сырой OOXML.
 
-## Lists
+## Списки
 
-### List item paragraph style
+### Стиль абзаца элемента списка
 
-Every list item paragraph uses **`ListParagraph`** (`w:pStyle`). Bullet vs ordered is determined solely by **`w:numPr`**:
+Каждый абзац элемента списка использует **`ListParagraph`** (`w:pStyle`). Маркированный vs нумерованный определяется исключительно через **`w:numPr`**:
 
 ```xml
 <w:pPr>
@@ -37,9 +37,9 @@ Every list item paragraph uses **`ListParagraph`** (`w:pStyle`). Bullet vs order
 </w:pPr>
 ```
 
-`ListBullet` and `ListNumber` remain in `styles.xml` for backward compatibility but are **not** emitted by handlers.
+`ListBullet` и `ListNumber` остаются в `styles.xml` для обратной совместимости, но **не** генерируются обработчиками.
 
-### Handler flow
+### Поток обработчиков
 
 ```mermaid
 flowchart TD
@@ -50,28 +50,28 @@ flowchart TD
     ParagraphHandler -->|"pStyle ListParagraph + numPr"| build_paragraph
 ```
 
-| Component | Role |
+| Компонент | Роль |
 |-----------|------|
 | `ListHandler` | Sets `context.list_style = list_paragraph`; tracks `list_ordered`, `list_level`, `list_num_id`; inserts Normal separator between adjacent top-level lists |
 | `ListItemHandler` | Processes block children |
 | `ParagraphHandler` | Emits `ListParagraph` + `numPr` when `list_style` is set |
 | `NumberingManager` | Owns `numbering.xml`; lvl `pStyle` is `ListParagraph` |
 
-### Nested lists
+### Вложенные списки
 
-- Same kind (bullet under bullet): reuse parent `numId`, increment `ilvl`.
-- Different kind (ordered under bullet): allocate a **new** `numId` for the correct `abstractNum` (no restart override).
-- Top-level restart: adjacent top-level lists of the same kind get a new `numId` with `startOverride=1`.
+- Один тип (маркированный под маркированным): повторное использование родительского `numId`, увеличение `ilvl`.
+- Разный тип (нумерованный под маркированным): выделение **нового** `numId` для правильного `abstractNum` (без override restart).
+- Перезапуск верхнего уровня: смежные списки верхнего уровня одного типа получают новый `numId` с `startOverride=1`.
 
-### Detecting active list paragraphs
+### Определение активных абзацев списка
 
-`api.is_active_list_paragraph()` checks for **`numPr/numId`**, not `ListBullet`/`ListNumber` pStyle. This drives list separator insertion.
+`api.is_active_list_paragraph()` проверяет **`numPr/numId`**, а не pStyle `ListBullet`/`ListNumber`. Это управляет вставкой разделителя списков.
 
-## Tables
+## Таблицы
 
-### Table style
+### Стиль таблицы
 
-Semantic `table` maps to OOXML **`TableGrid`** via `w:tblStyle`:
+Семантический `table` сопоставляется с OOXML **`TableGrid`** через `w:tblStyle`:
 
 ```xml
 <w:tblPr>
@@ -80,22 +80,22 @@ Semantic `table` maps to OOXML **`TableGrid`** via `w:tblStyle`:
 </w:tblPr>
 ```
 
-`TableHandler` resolves the semantic style through `StyleManager` and passes `table_style_id` to the document API.
+`TableHandler` разрешает семантический стиль через `StyleManager` и передаёт `table_style_id` в API документа.
 
-### Header rows
+### Строки заголовков
 
-AST `TableRow.header=True` (from `thead` / `th`) produces:
+AST `TableRow.header=True` (из `thead` / `th`) производит:
 
-1. `w:trPr/w:tblHeader` on the row (Word repeat-header semantics)
-2. Bold + centered cell paragraphs (visual fallback, unchanged)
+1. `w:trPr/w:tblHeader` на строке (семантика повторяющегося заголовка Word)
+2. Жирные и выровненные по центру абзацы ячеек (визуальный запасной вариант, без изменений)
 
-### What stays in the table layer
+### Что остаётся в слое таблиц
 
-Borders, column grid, cell margins, shading, valign, merge — all remain in `ooxml/table.py`. Cell paragraphs use **Normal** pStyle; inline formatting uses **RenderContext** (unchanged).
+Границы, сетка столбцов, поля ячеек, заливка, valign, объединение — всё остаётся в `ooxml/table.py`. Абзацы ячеек используют pStyle **Normal**; inline-форматирование использует **RenderContext** (без изменений).
 
-## Style ≠ Numbering ≠ Layout
+## Стиль ≠ нумерация ≠ макет
 
-| Concern | Owner | Example |
+| Область | Владелец | Пример |
 |---------|-------|---------|
 | Paragraph appearance | Style System | `ListParagraph`, `Normal` |
 | List markers & indents | NumberingManager | `numId`, `ilvl`, bullet glyph |
@@ -103,11 +103,11 @@ Borders, column grid, cell margins, shading, valign, merge — all remain in `oo
 | Table Word style | Style System | `TableGrid` |
 | Inline bold/italic/code | RenderContext | `w:rPr` on runs |
 
-See also [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md) and [`RENDERING_CONTEXT.md`](RENDERING_CONTEXT.md).
+См. также [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md) и [`RENDERING_CONTEXT.md`](RENDERING_CONTEXT.md).
 
-## Tests
+## Тесты
 
-| Area | Location |
+| Область | Расположение |
 |------|----------|
 | List handler unit tests | `tests/elements/test_list.py` |
 | NumberingManager unit tests | `tests/ooxml/test_numbering.py` |
@@ -117,10 +117,10 @@ See also [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md) and [`RENDERING_CONTEXT.md`](RENDE
 | Golden numbering.xml | `tests/golden/test_numbering_xml.py` |
 | Architecture boundaries | `tests/architecture/test_layer_boundaries.py` |
 
-Regenerate document goldens:
+Перегенерация golden document:
 
 ```bash
 python scripts/update-golden.py
 ```
 
-Numbering goldens are fixture-specific (`tests/expected/*.numbering.xml` for list cases).
+Golden numbering — специфичны для фикстур (`tests/expected/*.numbering.xml` for list cases).

@@ -1,38 +1,38 @@
-# Public API Reference
+# Справочник публичного API
 
-md2docx separates **stable public contracts** from **internal implementation**. Only symbols listed in this document (or sub-documents linked below) are supported for external use.
+md2docx разделяет **стабильные публичные контракты** и **внутреннюю реализацию**. Для внешнего использования поддерживаются только символы, перечисленные в этом документе (или в связанных поддокументах ниже).
 
-## API tiers
+## Уровни API
 
-### Tier A — Plugin API v1 (stable)
+### Уровень A — Plugin API v1 (стабильный)
 
-Namespace: `md2docx.plugin_api`
+Пространство имён: `md2docx.plugin_api`
 
-All Tier A symbols are listed in [`plugin_api/__init__.py`](../src/md2docx/plugin_api/__init__.py) `__all__` and mirrored in [`tests/contracts/api_manifest.json`](../tests/contracts/api_manifest.json).
+Все символы уровня A перечислены в `__all__` файла [`plugin_api/__init__.py`](../src/md2docx/plugin_api/__init__.py) и продублированы в [`tests/contracts/api_manifest.json`](../tests/contracts/api_manifest.json).
 
-Machine-readable manifest changes require an explicit update to the manifest and contract tests.
+Изменения машиночитаемого манифеста требуют явного обновления манифеста и контрактных тестов.
 
-See [`PLUGIN_API.md`](PLUGIN_API.md) for usage details.
+Подробности использования см. в [`PLUGIN_API.md`](PLUGIN_API.md).
 
-### Tier B — Plugin adjuncts (stable with plugin API v1)
+### Уровень B — Дополнения для плагинов (стабильные вместе с plugin API v1)
 
-These modules are stable for plugin authors but are not re-exported from `plugin_api`:
+Эти модули стабильны для авторов плагинов, но не реэкспортируются из `plugin_api`:
 
-| Module | Symbols |
+| Модуль | Символы |
 |--------|---------|
 | `md2docx.styles.definition` | `StyleDefinition`, `ParagraphStyle`, `RunStyle` |
-| `md2docx.ooxml.api` | Legacy OOXML builders (`paragraph`, `run`, `text`, …) |
+| `md2docx.ooxml.api` | Устаревшие OOXML-билдеры (`paragraph`, `run`, `text`, …) |
 | `md2docx.semantic` | Rich Semantic API (`RichDocumentFragment`, `paragraph`, `text`, `bold`, …) |
 
-Handlers may return `RichDocumentFragment` from `process()` or template region renderers. Prefer `md2docx.semantic` for new plugins.
+Обработчики могут возвращать `RichDocumentFragment` из `process()` или рендереров регионов шаблона. Для новых плагинов предпочтителен `md2docx.semantic`.
 
-Handlers receive runtime objects from the engine (`context`, `processor`). Wrap with `SemanticContext.from_processing_context(context)` when calling `render()`. Do **not** import `md2docx.processor.*` in plugins.
+Обработчики получают объекты времени выполнения от движка (`context`, `processor`). Оборачивайте их в `SemanticContext.from_processing_context(context)` при вызове `render()`. **Не** импортируйте `md2docx.processor.*` в плагинах.
 
 ## Rich Semantic API
 
-Namespace: `md2docx.semantic` (Tier B)
+Пространство имён: `md2docx.semantic` (уровень B)
 
-Build document content as immutable semantic values, not raw OOXML:
+Создавайте содержимое документа как неизменяемые семантические значения, а не сырой OOXML:
 
 ```python
 from md2docx.semantic import RichDocumentFragment, bold, fragment, paragraph, text
@@ -42,37 +42,37 @@ return fragment(
 )
 ```
 
-Supported operations:
+Поддерживаемые операции:
 
-- Paragraphs with styled inline runs (`text`, `bold`, `italic`, `strike`, `inline_code`)
+- Абзацы со стилизованными встроенными фрагментами (`text`, `bold`, `italic`, `strike`, `inline_code`)
 - `line_break()`, `hyperlink()`, `hyperlink_to()`
-- Whitelisted fields (`page_field`, `title_field`, `ref_field`, …)
+- Поля из белого списка (`page_field`, `title_field`, `ref_field`, …)
 - `image()`, `figure()`, `cross_reference()`
 - `bullet_list()`, `ordered_list()`
-- `bookmark()` paragraphs
-- Fragment composition via `+` and `fragment(...)`
+- Абзацы с `bookmark()`
+- Композиция фрагментов через `+` и `fragment(...)`
 
-Unsupported in v1: arbitrary OOXML, arbitrary field instructions, raw `numId`/`rId`, remote image URLs, semantic tables.
+Не поддерживается в v1: произвольный OOXML, произвольные инструкции полей, сырые `numId`/`rId`, URL удалённых изображений, семантические таблицы.
 
-See [`ITERATION_28_AUDIT.md`](ITERATION_28_AUDIT.md) for design rationale.
+Обоснование проектных решений см. в [`ITERATION_28_AUDIT.md`](ITERATION_28_AUDIT.md).
 
-### Tier C — CLI behavioral contract (stable)
+### Уровень C — Поведенческий контракт CLI (стабильный)
 
-| Aspect | Contract |
+| Аспект | Контракт |
 |--------|----------|
-| Entry | `md2docx INPUT [-o OUTPUT]` |
-| `--plugin PATH` | Repeatable; loads Python plugins in argument order |
-| Exit codes | `0` success, `1` usage/input config, `2` conversion/validation errors |
-| Errors | `Error: {message}` on stderr without traceback in normal mode |
-| `--debug` | Full traceback for unexpected internal errors only |
-| `--validate` | Validates temp output before atomic replace; preserves existing file on failure |
-| I/O | Rejects input directories, output directories, and identical input/output paths |
+| Точка входа | `md2docx INPUT [-o OUTPUT]` |
+| `--plugin PATH` | Повторяемый; загружает Python-плагины в порядке аргументов |
+| Коды выхода | `0` — успех, `1` — использование/конфигурация ввода, `2` — ошибки конвертации/валидации |
+| Ошибки | `Error: {message}` в stderr без traceback в обычном режиме |
+| `--debug` | Полный traceback только для неожиданных внутренних ошибок |
+| `--validate` | Валидирует временный вывод перед атомарной заменой; при сбое сохраняет существующий файл |
+| Ввод/вывод | Отклоняет каталоги на входе, каталоги на выходе и идентичные пути ввода/вывода |
 
-See [`ERROR_HANDLING.md`](ERROR_HANDLING.md) and [`PLUGINS.md`](PLUGINS.md).
+См. [`ERROR_HANDLING.md`](ERROR_HANDLING.md) и [`PLUGINS.md`](PLUGINS.md).
 
-### Tier D — Programmatic integration (experimental)
+### Уровень D — Программная интеграция (экспериментальный)
 
-These subpackages export symbols via `__all__` but are not yet versioned as strictly as Tier A:
+Эти подпакеты экспортируют символы через `__all__`, но пока не версионируются так же строго, как уровень A:
 
 - `md2docx.pipeline.convert_markdown_to_docx`
 - `md2docx.metadata`
@@ -80,11 +80,11 @@ These subpackages export symbols via `__all__` but are not yet versioned as stri
 - `md2docx.templates`
 - `md2docx.validation`
 
-Use for integration testing and tooling; expect slower stability guarantees than Tier A.
+Используйте для интеграционного тестирования и инструментов; ожидайте менее строгих гарантий стабильности, чем у уровня A.
 
-## Internal (unsupported)
+## Внутреннее (не поддерживается)
 
-Undocumented imports may break without notice:
+Недокументированные импорты могут измениться без предупреждения:
 
 ```text
 md2docx.parser.*
@@ -96,21 +96,21 @@ md2docx.ast.*
 md2docx.plugins.loader
 ```
 
-## Compatibility policy
+## Политика совместимости
 
-| Change type | Policy |
-|-------------|--------|
-| Additive Tier A symbol | Update manifest + docs + contract tests |
-| Breaking Tier A change | Bump `PLUGIN_API_VERSION` |
-| Internal refactor | Allowed if contract tests pass |
-| OOXML/XML structure | May change if semantic behavior preserved |
+| Тип изменения | Политика |
+|---------------|----------|
+| Аддитивный символ уровня A | Обновить манифест + документацию + контрактные тесты |
+| Критическое изменение уровня A | Увеличить `PLUGIN_API_VERSION` |
+| Внутренний рефакторинг | Допустим, если контрактные тесты проходят |
+| Структура OOXML/XML | Может измениться, если семантическое поведение сохранено |
 
-## Error contract
+## Контракт ошибок
 
-Public plugin errors expose stable `code` attributes (see [`plugin_api/errors.py`](../src/md2docx/plugin_api/errors.py)). Contract tests assert exception **types** and **codes**, not full message strings.
+Публичные ошибки плагинов предоставляют стабильные атрибуты `code` (см. [`plugin_api/errors.py`](../src/md2docx/plugin_api/errors.py)). Контрактные тесты проверяют **типы** и **коды** исключений, а не полные строки сообщений.
 
-| Exception | Code |
-|-----------|------|
+| Исключение | Код |
+|------------|-----|
 | `PluginLoadError` | `plugin_load_error` |
 | `DuplicateRegistrationError` | `duplicate_registration` |
 | `RegistryFrozenError` | `registry_frozen` |
@@ -118,21 +118,21 @@ Public plugin errors expose stable `code` attributes (see [`plugin_api/errors.py
 | `InvalidPluginNameError` | `invalid_plugin_name` |
 | `ReservedNameError` | `reserved_name` |
 
-Naming validation failures (`InvalidPluginNameError`, `ReservedNameError`) collectively cover validation errors described as `PluginValidationError` in design docs.
+Сбои валидации имён (`InvalidPluginNameError`, `ReservedNameError`) в совокупности покрывают ошибки валидации, описанные в проектной документации как `PluginValidationError`.
 
-## Contract tests
+## Контрактные тесты
 
-Run:
+Запуск:
 
 ```bash
 pytest tests/contracts/ -q
 ```
 
-The manifest snapshot test fails if `plugin_api.__all__` changes without updating `api_manifest.json`.
+Снимочный тест манифеста завершится с ошибкой, если `plugin_api.__all__` изменится без обновления `api_manifest.json`.
 
-## Related docs
+## Связанная документация
 
-- [`PLUGIN_API.md`](PLUGIN_API.md) — plugin extension reference
-- [`PLUGIN_MIGRATION.md`](PLUGIN_MIGRATION.md) — API v1 migration notes
-- [`ERROR_HANDLING.md`](ERROR_HANDLING.md) — exit codes, atomic output, `--debug`
-- [`RELEASE_READINESS.md`](RELEASE_READINESS.md) — release checklist
+- [`PLUGIN_API.md`](PLUGIN_API.md) — справочник расширений для плагинов
+- [`PLUGIN_MIGRATION.md`](PLUGIN_MIGRATION.md) — заметки по миграции на API v1
+- [`ERROR_HANDLING.md`](ERROR_HANDLING.md) — коды выхода, атомарный вывод, `--debug`
+- [`RELEASE_READINESS.md`](RELEASE_READINESS.md) — чеклист релиза

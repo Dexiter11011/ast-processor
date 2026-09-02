@@ -1,23 +1,23 @@
-# Rendering Context
+# Контекст рендеринга
 
-Iteration 8 introduces an explicit rendering model for inline Markdown → OOXML conversion.
+Итерация 8 вводит явную модель рендеринга для inline-преобразования Markdown → OOXML.
 
-## Problem
+## Проблема
 
-Previously, `StrongHandler` and `EmphasisHandler` collected nested runs and applied `api.bold()` / `api.italic()` **after** run creation. Formatting lived implicitly in finished `w:rPr` elements rather than in typed context state.
+Ранее `StrongHandler` и `EmphasisHandler` собирали вложенные runs и применяли `api.bold()` / `api.italic()` **после** создания run. Форматирование жило неявно в готовых элементах `w:rPr`, а не в типизированном состоянии контекста.
 
-## Model
+## Модель
 
-Two immutable dataclasses in `processor/inline_formatting.py`:
+Два неизменяемых dataclass в `processor/inline_formatting.py`:
 
-- **`InlineFormatting`** — `{ bold, italic, code }` with `with_bold()`, `with_italic()`, `with_code()`
-- **`RenderContext`** — wraps `InlineFormatting`; `derive()` creates child context without mutating parent
+- **`InlineFormatting`** — `{ bold, italic, code }` с `with_bold()`, `with_italic()`, `with_code()`
+- **`RenderContext`** — оборачивает `InlineFormatting`; `derive()` создаёт дочерний контекст без изменения родителя
 
-`ProcessingContext.render_context` holds the current state. Handlers use `push_render_context()` to scope formatting to AST subtrees.
+`ProcessingContext.render_context` хранит текущее состояние. Обработчики используют `push_render_context()` для ограничения форматирования поддеревьями AST.
 
-## Handler rules
+## Правила обработчиков
 
-| Handler | Behavior |
+| Handler | Поведение |
 |---------|----------|
 | `TextHandler` | `api.run_from_formatting(text, context.render_context.formatting)` |
 | `StrongHandler` | Derive `with_bold()`, process children |
@@ -25,30 +25,30 @@ Two immutable dataclasses in `processor/inline_formatting.py`:
 | `InlineCodeHandler` | Derive `with_code()`, resolve Code character style |
 | `LinkHandler` | Same render context for children; one external rel via `RelationshipManager` |
 
-Strong/Emphasis must **not** call `api.bold()` / `api.italic()` directly.
+Strong/Emphasis **не должны** вызывать `api.bold()` / `api.italic()` напрямую.
 
-## OOXML layer
+## Слой OOXML
 
 `ooxml/run_format.py`:
 
 - `run_from_formatting(text, formatting, *, r_style="")` — build `w:r` at emission time
 - `apply_inline_formatting(run, formatting, *, r_style="")` — apply state to existing run
 
-`api.run_from_formatting` is the handler-facing entry point.
+`api.run_from_formatting` — точка входа для обработчиков.
 
-## Non-goals (this iteration)
+## Нецели (эта итерация)
 
-- Run merging / coalescing adjacent runs with identical formatting
-- New Markdown features
-- Changes to `AstProcessor`, parser, or AST types
+- Слияние / coalescing соседних runs с одинаковым форматированием
+- Новые возможности Markdown
+- Изменения `AstProcessor`, парсера или типов AST
 
-## Tests
+## Тесты
 
-- `tests/processor/test_render_context.py` — unit tests for derive/isolation
-- `tests/elements/test_formatting_leakage.py` — bold/italic must not leak across siblings
-- `tests/fixtures/inline-formatting-matrix.md` — exhaustive inline fixture
-- `tests/architecture/test_layer_boundaries.py` — handlers must not call `api.bold`/`api.italic`
+- `tests/processor/test_render_context.py` — unit-тесты derive/isolation
+- `tests/elements/test_formatting_leakage.py` — bold/italic не должны протекать между соседними узлами
+- `tests/fixtures/inline-formatting-matrix.md` — исчерпывающий inline-fixture
+- `tests/architecture/test_layer_boundaries.py` — handlers не должны вызывать `api.bold`/`api.italic`
 
-## Related
+## Связанные материалы
 
-Document-level styles (Heading1, Quote, Normal) are handled by the **Style System** — see [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md). Render Context covers inline formatting only.
+Стили уровня документа (Heading1, Quote, Normal) обрабатываются **системой стилей** — см. [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md). Render Context охватывает только inline-форматирование.

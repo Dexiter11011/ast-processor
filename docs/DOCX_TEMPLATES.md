@@ -1,20 +1,20 @@
-# DOCX Templates
+# Шаблоны DOCX
 
-Iteration 17 adds external DOCX templates and the `--template` CLI flag.
+Итерация 17 добавляет внешние шаблоны DOCX и флаг CLI `--template`.
 
-Iteration 18 adds scalar template placeholders and document context metadata.
+Итерация 18 добавляет скалярные плейсхолдеры шаблона и метаданные контекста документа.
 
-Iteration 25 adds navigation template regions (`{{toc}}`, `{{list_of_figures}}`, `{{list_of_tables}}`). See [`TEMPLATE_REGIONS.md`](TEMPLATE_REGIONS.md).
+Итерация 25 добавляет регионы навигации в шаблоне (`{{toc}}`, `{{list_of_figures}}`, `{{list_of_tables}}`). См. [`TEMPLATE_REGIONS.md`](TEMPLATE_REGIONS.md).
 
-## Template vs Theme vs Document Context
+## Шаблон vs тема vs контекст документа
 
-| Concept | Role |
+| Концепция | Роль |
 |---------|------|
-| **Template** | Base DOCX package (structure, Word styles, headers/footers, sections, media) |
-| **Theme** | Visual token configuration (YAML) that affects `styles.xml` |
-| **DocumentContext** | User/document data for placeholders and core properties |
+| **Template** | Базовый пакет DOCX (структура, стили Word, колонтитулы, секции, медиа) |
+| **Theme** | Конфигурация визуальных токенов (YAML), влияющая на `styles.xml` |
+| **DocumentContext** | Пользовательские/документные данные для плейсхолдеров и основных свойств |
 
-They are separate:
+Они разделены:
 
 ```text
 Template          = physical DOCX structure
@@ -22,7 +22,7 @@ Theme             = visual configuration
 DocumentContext   = title, author, date, subject, keywords
 ```
 
-## Architecture
+## Архитектура
 
 ```text
 Template DOCX
@@ -40,7 +40,7 @@ TemplateComposer (placeholder scan/validate/replace + insertion + remapping)
 Final DOCX package
 ```
 
-Optional theme layer:
+Опциональный слой темы:
 
 ```text
 Template styles.xml
@@ -50,13 +50,13 @@ Theme styles (merge/override)
 Merged styles.xml
 ```
 
-## Usage
+## Использование
 
 ```bash
 md2docx README.md --template examples/templates/corporate.docx -o README.docx
 ```
 
-With theme:
+С темой:
 
 ```bash
 md2docx README.md \
@@ -65,7 +65,7 @@ md2docx README.md \
   -o README.docx
 ```
 
-With placeholders:
+С плейсхолдерами:
 
 ```bash
 md2docx README.md \
@@ -76,9 +76,9 @@ md2docx README.md \
   -o README.docx
 ```
 
-## Placeholders
+## Плейсхолдеры
 
-Supported standalone paragraph placeholders:
+Поддерживаемые плейсхолдеры в отдельном абзаце:
 
 ```text
 {{content}}
@@ -92,7 +92,7 @@ Supported standalone paragraph placeholders:
 {{keywords}}
 ```
 
-Example template body:
+Пример тела шаблона:
 
 ```text
 Title:
@@ -107,37 +107,37 @@ Date:
 {{content}}
 ```
 
-Rules:
+Правила:
 
-- Placeholder must be the only text in its paragraph (split runs are OK)
-- `{{content}}` must appear exactly once
-- Navigation regions (`{{toc}}`, `{{list_of_figures}}`, `{{list_of_tables}}`) may appear zero or more times
-- Scalar placeholders may appear multiple times (same value)
-- Unknown placeholders → error
-- Missing required values → error
-- Inline placeholders (`Project: {{title}}`) → error
-- No expressions, filters, or scripting
+- Плейсхолдер должен быть единственным текстом в своём абзаце (разделённые runs допустимы)
+- `{{content}}` должен встречаться ровно один раз
+- Регионы навигации (`{{toc}}`, `{{list_of_figures}}`, `{{list_of_tables}}`) могут встречаться ноль или более раз
+- Скалярные плейсхолдеры могут встречаться несколько раз (одно и то же значение)
+- Неизвестные плейсхолдеры → ошибка
+- Отсутствующие обязательные значения → ошибка
+- Встроенные плейсхолдеры (`Project: {{title}}`) → ошибка
+- Без выражений, фильтров и скриптов
 
-## Document Context
+## Контекст документа
 
-Values are populated from:
+Значения заполняются из:
 
-1. CLI flags (`--title`, `--author`, `--date`) — highest precedence
-2. Markdown YAML front matter — fallback for title/author/subject/keywords
+1. Флагов CLI (`--title`, `--author`, `--date`) — наивысший приоритет
+2. YAML front matter в Markdown — запасной вариант для title/author/subject/keywords
 
-`{{date}}` requires an explicit `--date` value. The engine does not use the system clock for placeholder dates.
+`{{date}}` требует явного значения `--date`. Движок не использует системные часы для дат в плейсхолдерах.
 
-Core properties (`docProps/core.xml`) are synchronized from the same document context for title, author, subject, and keywords.
+Основные свойства (`docProps/core.xml`) синхронизируются из того же контекста документа для title, author, subject и keywords.
 
-## Content insertion point
+## Точка вставки контента
 
-Templates must contain exactly **one standalone paragraph**:
+Шаблоны должны содержать ровно **один отдельный абзац**:
 
 ```text
 {{content}}
 ```
 
-Example:
+Пример:
 
 ```text
 Introduction
@@ -147,67 +147,67 @@ Introduction
 Signature
 ```
 
-Rules:
+Правила:
 
-- Placeholder must be the only text in its paragraph (split runs are OK)
-- Missing placeholder → error
-- Multiple `{{content}}` placeholders → error
-- Inline placeholder (`Hello {{content}}`) → error
+- Плейсхолдер должен быть единственным текстом в своём абзаце (разделённые runs допустимы)
+- Отсутствующий плейсхолдер → ошибка
+- Несколько плейсхолдеров `{{content}}` → ошибка
+- Встроенный плейсхолдер (`Hello {{content}}`) → ошибка
 
-## Precedence
+## Приоритет
 
-| Combination | Result |
+| Комбинация | Результат |
 |-------------|--------|
-| no template, no theme | Default greenfield DOCX (Iter 15 default) |
-| template only | Template package + inserted content; template `styles.xml` |
-| theme only | Theme-driven `styles.xml` (Iter 16) |
-| template + theme | Template shell preserved; theme merges into template styles |
-| template + metadata flags | Placeholders replaced; core props updated when title/author/subject/keywords present |
+| no template, no theme | DOCX по умолчанию с нуля (Iter 15 default) |
+| template only | Пакет шаблона + вставленный контент; `styles.xml` шаблона |
+| theme only | `styles.xml`, управляемый темой (Iter 16) |
+| template + theme | Оболочка шаблона сохранена; тема объединяется со стилями шаблона |
+| template + metadata flags | Плейсхолдеры заменены; core props обновлены при наличии title/author/subject/keywords |
 
-Section/header/footer directives in Markdown are **not supported** with `--template` (template headers/footers are preserved).
+Директивы секций/колонтитулов в Markdown **не поддерживаются** с `--template` (колонтитулы шаблона сохраняются).
 
-## Package preservation
+## Сохранение пакета
 
-The merger preserves template parts including:
+Слияние сохраняет части шаблона, включая:
 
-- `word/settings.xml`, `word/fontTable.xml`, `word/theme/*` (if present)
-- Template headers and footers
-- Template media
-- Unknown extra parts
+- `word/settings.xml`, `word/fontTable.xml`, `word/theme/*` (если присутствуют)
+- Колонтитулы шаблона
+- Медиа шаблона
+- Неизвестные дополнительные части
 
-Generated content adds:
+Сгенерированный контент добавляет:
 
-- Inserted body blocks at `{{content}}`
-- Scalar placeholder text replacement in template body
-- New relationships (remapped rIds)
-- New media (with collision-safe filenames)
-- Merged numbering definitions (remapped numIds)
-- Generated bookmark IDs remapped above template max ID
-- Generated bookmark **names** remapped on collision (`architecture` → `architecture-1`); template bookmarks preserved
+- Вставленные блоки тела в `{{content}}`
+- Замену текста скалярных плейсхолдеров в теле шаблона
+- Новые связи (переназначенные rIds)
+- Новые медиа (с безопасными при коллизиях именами файлов)
+- Объединённые определения нумерации (переназначенные numIds)
+- Сгенерированные ID закладок переназначены выше максимального ID шаблона
+- Сгенерированные **имена** закладок переназначены при коллизии (`architecture` → `architecture-1`); закладки шаблона сохранены
 
-### Bookmark name collision policy
+### Политика коллизий имён закладок
 
-When generated content contains a bookmark with the same name as a template bookmark:
+Когда сгенерированный контент содержит закладку с тем же именем, что и закладка шаблона:
 
-1. Template bookmark keeps its original name
-2. Generated bookmark receives a deterministic suffix (`-1`, `-2`, …)
-3. Generated REF fields and internal hyperlinks in the fragment are rewritten to the new name
-4. Template REF fields are not modified
+1. Закладка шаблона сохраняет исходное имя
+2. Сгенерированная закладка получает детерминированный суффикс (`-1`, `-2`, …)
+3. Сгенерированные поля REF и внутренние гиперссылки во фрагменте переписываются на новое имя
+4. Поля REF шаблона не изменяются
 
-See [`NAVIGATION.md`](NAVIGATION.md) for full navigation architecture.
+См. [`NAVIGATION.md`](NAVIGATION.md) для полной архитектуры навигации.
 
-## Building template fixtures
+## Сборка фикстур шаблонов
 
 ```bash
 PYTHONPATH=src python scripts/build-template-fixtures.py
 ```
 
-Creates:
+Создаёт:
 
 - `tests/fixtures/templates/minimal.docx`
 - `tests/fixtures/templates/corporate.docx`
 - `tests/fixtures/templates/corporate-navigation.docx` (TOC + LOF + LOT + `{{content}}`)
-- `tests/fixtures/templates/navigation-collision.docx` (bookmark collision test fixture)
+- `tests/fixtures/templates/navigation-collision.docx` (фикстура теста коллизии закладок)
 - `tests/fixtures/templates/placeholders-basic.docx`
 - `tests/fixtures/templates/placeholders-formatting.docx`
 - `tests/fixtures/templates/regions-basic.docx`
@@ -216,4 +216,4 @@ Creates:
 - `examples/templates/corporate.docx`
 - `examples/templates/placeholders.docx`
 
-See also [`THEMES.md`](THEMES.md), [`EXTERNAL_THEMES.md`](EXTERNAL_THEMES.md), [`TEMPLATE_REGIONS.md`](TEMPLATE_REGIONS.md), and [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) for the distinction between static placeholders and dynamic Word fields.
+См. также [`THEMES.md`](THEMES.md), [`EXTERNAL_THEMES.md`](EXTERNAL_THEMES.md), [`TEMPLATE_REGIONS.md`](TEMPLATE_REGIONS.md) и [`DYNAMIC_FIELDS.md`](DYNAMIC_FIELDS.md) для различия между статическими плейсхолдерами и динамическими полями Word.

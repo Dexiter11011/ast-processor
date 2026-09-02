@@ -1,8 +1,8 @@
-# References and Table of Contents
+# Ссылки и оглавление
 
-Iteration 12 separates four related but distinct document navigation mechanisms.
+Итерация 12 разделяет четыре связанных, но различных механизма навигации по документу.
 
-## Four mechanisms
+## Четыре механизма
 
 ```text
 Hyperlink     → jump to URL or in-document anchor
@@ -11,9 +11,9 @@ Cross-reference → pointer to an existing bookmark (internal links cover the pr
 TOC           → Word field that builds a navigable outline on open
 ```
 
-These must not be collapsed into one implementation.
+Их нельзя сводить к одной реализации.
 
-## External hyperlinks
+## Внешние гиперссылки
 
 Markdown:
 
@@ -21,7 +21,7 @@ Markdown:
 [OpenAI](https://openai.com)
 ```
 
-Flow:
+Поток:
 
 ```text
 Link AST
@@ -31,9 +31,9 @@ Link AST
   → w:hyperlink r:id="rIdN"
 ```
 
-Same URL targets reuse one relationship ID.
+Одинаковые URL-цели используют один ID связи.
 
-## Internal hyperlinks
+## Внутренние гиперссылки
 
 Markdown:
 
@@ -43,7 +43,7 @@ Markdown:
 See [the intro](#introduction).
 ```
 
-Flow:
+Поток:
 
 ```text
 Heading AST
@@ -59,72 +59,72 @@ Link AST (#introduction)
   → w:hyperlink w:anchor="introduction"   (no relationship)
 ```
 
-Internal links never create external relationships.
+Внутренние ссылки никогда не создают внешних связей.
 
-## Heading bookmarks (default-on)
+## Закладки заголовков (включены по умолчанию)
 
-Every heading receives a deterministic bookmark slug derived from its plain text:
+Каждый заголовок получает детерминированный slug закладки, производный от его простого текста:
 
-| Heading text   | Bookmark name   |
-|----------------|-----------------|
-| Hello World    | hello-world     |
-| API Reference! | api-reference   |
+| Текст заголовка | Имя закладки |
+|-----------------|--------------|
+| Hello World | hello-world |
+| API Reference! | api-reference |
 | Introduction (×3) | introduction, introduction-1, introduction-2 |
 
-Slug rules (`references/slug.py`):
+Правила slug (`references/slug.py`):
 
-- Lowercase, NFKD normalize, punctuation → hyphens
-- Unicode letters/digits preserved after normalization
-- Empty slug → `section`
-- Duplicate slugs get numeric suffixes
+- Нижний регистр, нормализация NFKD, пунктуация → дефисы
+- Буквы и цифры Unicode сохраняются после нормализации
+- Пустой slug → `section`
+- Дубликаты slug получают числовые суффиксы
 
-Formatting inside headings is ignored for slug text (GitHub-style).
+Форматирование внутри заголовков игнорируется для текста slug (в стиле GitHub).
 
-## Broken internal links
+## Битые внутренние ссылки
 
 ```markdown
 [Missing](#does-not-exist)
 ```
 
-When the bookmark is not registered:
+Когда закладка не зарегистрирована:
 
-- No hyperlink is emitted
-- Link text renders as plain inline runs
-- Package validation can flag unresolved anchors if they were emitted
+- Гиперссылка не создаётся
+- Текст ссылки рендерится как обычные inline runs
+- Проверка пакета может пометить неразрешённые якоря, если они были созданы
 
-Missing bookmarks are never created silently.
+Отсутствующие закладки никогда не создаются молча.
 
-## Table of contents
+## Оглавление
 
-Insert via HTML comment directive (same pattern as page/section breaks):
+Вставка через HTML-комментарий-директиву (тот же шаблон, что у разрывов страниц/секций):
 
 ```markdown
 <!-- toc -->
 <!-- toc: 2-3 -->
 ```
 
-Produces a Word complex field:
+Создаёт сложное поле Word:
 
 ```text
 w:fldChar begin → w:instrText TOC \o "1-3" \h \z \u → w:fldChar separate → w:fldChar end
 ```
 
-Word updates the visible TOC when the document is opened. The generator does not render a static numbered list.
+Word обновляет видимое оглавление при открытии документа. Генератор не рендерит статический нумерованный список.
 
-TOC styles `TOC1`, `TOC2`, `TOC3` are registered in the Style System.
+Стили TOC `TOC1`, `TOC2`, `TOC3` регистрируются в Style System.
 
-## Ownership
+## Владение
 
-| Concern | Owner |
-|---------|-------|
-| External URL relationships | `RelationshipManager` |
-| Bookmark IDs and slug registry | `BookmarkManager` |
-| TOC field instruction | `TocManager` |
-| OOXML emission | `md2docx.ooxml.api` |
+| Задача | Владелец |
+|--------|----------|
+| Связи с внешними URL | `RelationshipManager` |
+| ID закладок и реестр slug | `BookmarkManager` |
+| Инструкция поля TOC | `TocManager` |
+| Генерация OOXML | `md2docx.ooxml.api` |
 
-Handlers must not write raw `w:hyperlink`, `w:bookmarkStart`, `w:bookmarkEnd`, or field XML.
+Обработчики не должны писать сырой XML `w:hyperlink`, `w:bookmarkStart`, `w:bookmarkEnd` или полей.
 
-## Components
+## Компоненты
 
 ```text
 src/md2docx/references/   Bookmark, BookmarkManager, slug, validator
@@ -134,9 +134,9 @@ src/md2docx/ooxml/field.py
 src/md2docx/elements/toc.py
 ```
 
-## Tests
+## Тесты
 
-- `tests/references/` — slug and BookmarkManager unit tests
+- `tests/references/` — модульные тесты slug и BookmarkManager
 - `tests/ooxml/test_bookmark.py`, `test_toc_field.py`
 - `tests/integration/test_hyperlinks_docx.py`, `test_bookmarks_docx.py`, `test_toc_docx.py`
-- Golden fixtures: `external-links`, `internal-links`, `bookmarks`, `toc`, `references-integration`, …
+- Golden-фикстуры: `external-links`, `internal-links`, `bookmarks`, `toc`, `references-integration`, …

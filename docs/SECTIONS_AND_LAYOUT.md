@@ -1,8 +1,8 @@
-# Sections, Page Layout, Headers & Footers
+# Секции, макет страницы, колонтитулы
 
-Iteration 11 adds document section structure separate from the Style System and NumberingManager.
+Итерация 11 добавляет структуру секций документа отдельно от Style System и NumberingManager.
 
-## Four layers
+## Четыре слоя
 
 ```text
 Style System     → paragraph/run/table appearance (Heading1, Normal, TableGrid)
@@ -11,7 +11,7 @@ SectionManager   → page layout, section breaks, headers/footers
 Table OOXML      → grid, borders, cell layout
 ```
 
-## Section model
+## Модель секции
 
 ```text
 Section
@@ -20,29 +20,29 @@ Section
 └── footer_rel_id (optional)
 ```
 
-Default document: **one A4 portrait section** with final `w:sectPr` on `w:body`.
+Документ по умолчанию: **одна секция A4 portrait** с финальным `w:sectPr` на `w:body`.
 
-Multi-section documents place inline `w:sectPr` on the **last paragraph** of each prior section; the final section uses body-level `w:sectPr`.
+В многосекционных документах inline `w:sectPr` размещается на **последнем абзаце** каждой предыдущей секции; финальная секция использует `w:sectPr` на уровне body.
 
-## Page break vs section break
+## Разрыв страницы и разрыв секции
 
-| Feature | OOXML | Markdown directive |
+| Функция | OOXML | Директива Markdown |
 |---------|-------|-------------------|
 | Page break | `<w:br w:type="page"/>` | `<!-- pagebreak -->` |
 | Section break | inline `w:sectPr` + new section | `<!-- section: landscape -->` |
 
-Page break does **not** change section properties. Section break starts a new `Section` with its own layout and optional header/footer.
+Разрыв страницы **не** меняет свойства секции. Разрыв секции начинает новую `Section` с собственным макетом и необязательными header/footer.
 
-## Header / footer directives
+## Директивы header / footer
 
 ```markdown
 <!-- header: Document Title -->
 <!-- footer: Page 1 -->
 ```
 
-These set header/footer content for the **current section**. Header/footer parts reuse the same paragraph/run OOXML builders and `Normal` style — no separate HeaderParagraphStyle.
+Они задают содержимое header/footer для **текущей секции**. Части header/footer переиспользуют те же сборщики OOXML абзацев/runs и стиль `Normal` — отдельного HeaderParagraphStyle нет.
 
-Package structure:
+Структура пакета:
 
 ```text
 word/document.xml
@@ -50,35 +50,35 @@ word/document.xml
     └── footerReference → word/footer1.xml
 ```
 
-## Layout specs
+## Спецификации макета
 
-Section directive examples:
+Примеры директив секции:
 
-| Directive | Result |
-|-----------|--------|
+| Директива | Результат |
+|-----------|-----------|
 | `<!-- section: a4 -->` | A4 portrait |
 | `<!-- section: letter -->` | Letter portrait |
 | `<!-- section: landscape -->` | A4 landscape |
-| `<!-- section: a4 margins=720,720,720,720 -->` | A4 with custom margins (twips) |
+| `<!-- section: a4 margins=720,720,720,720 -->` | A4 с пользовательскими полями (twips) |
 
-Units: **twips** (1/1440 inch), consistent with OOXML `pgSz` / `pgMar`.
+Единицы: **twips** (1/1440 дюйма), согласованно с OOXML `pgSz` / `pgMar`.
 
-## Components
+## Компоненты
 
-| Component | Location |
-|-----------|----------|
+| Компонент | Расположение |
+|-----------|--------------|
 | `PageLayout`, `Section` | `sections/definition.py` |
 | `SectionManager` | `sections/manager.py` |
 | `build_sect_pr()` | `ooxml/section.py` |
-| Header/footer parts | `ooxml/header_footer.py` |
+| Части header/footer | `ooxml/header_footer.py` |
 | Page break | `ooxml/page_break.py` |
-| Block directives | `parser/block_directive.py` |
+| Блочные директивы | `parser/block_directive.py` |
 
-## Tests
+## Тесты
 
-- `tests/sections/` — layout model
-- `tests/ooxml/test_section.py` — sectPr serialization
+- `tests/sections/` — модель макета
+- `tests/ooxml/test_section.py` — сериализация sectPr
 - `tests/integration/test_sections_layout.py` — page break, landscape, header/footer
-- `tests/fixtures/sections-integration.md` — combined integration fixture
+- `tests/fixtures/sections-integration.md` — комбинированная интеграционная фикстура
 
-See also [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md), [`LISTS_AND_TABLES.md`](LISTS_AND_TABLES.md), [`RENDERING_CONTEXT.md`](RENDERING_CONTEXT.md).
+См. также [`STYLE_SYSTEM.md`](STYLE_SYSTEM.md), [`LISTS_AND_TABLES.md`](LISTS_AND_TABLES.md), [`RENDERING_CONTEXT.md`](RENDERING_CONTEXT.md).
