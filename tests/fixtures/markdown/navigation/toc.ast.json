@@ -1,0 +1,66 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "table_of_contents",
+      "min_level": 1,
+      "max_level": 3
+    },
+    {
+      "type": "table_of_contents",
+      "min_level": 2,
+      "max_level": 3
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Alpha"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Beta"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "children": [
+        {
+          "type": "text",
+          "value": "Gamma"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Delta"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Epsilon"
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

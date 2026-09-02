@@ -1,0 +1,45 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Architecture"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "See "
+        },
+        {
+          "type": "link",
+          "url": "#architecture",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "value": "Architecture section"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": "."
+        }
+      ]
+    },
+    {
+      "type": "field_directive",
+      "kind": "ref",
+      "target": "architecture"
+    }
+  ],
+  "metadata": null
+}

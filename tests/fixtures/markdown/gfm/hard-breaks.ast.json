@@ -1,0 +1,64 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "First line"
+        },
+        {
+          "type": "line_break"
+        },
+        {
+          "type": "text",
+          "value": "Second line with two trailing spaces break."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Third line"
+        },
+        {
+          "type": "line_break"
+        },
+        {
+          "type": "text",
+          "value": "Fourth line with backslash break."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "strong",
+          "children": [
+            {
+              "type": "text",
+              "value": "Bold first"
+            }
+          ]
+        },
+        {
+          "type": "line_break"
+        },
+        {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "Italic second"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

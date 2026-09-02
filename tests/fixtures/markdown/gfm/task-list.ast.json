@@ -1,0 +1,119 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Todo item"
+                }
+              ]
+            }
+          ],
+          "checked": false
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Done item"
+                }
+              ]
+            }
+          ],
+          "checked": true
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Bold task"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "checked": false
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Italic done"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "checked": true
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "link",
+                  "url": "https://example.com",
+                  "title": null,
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Documentation"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "checked": false
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Regular bullet (not a task)"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

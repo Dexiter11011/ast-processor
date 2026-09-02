@@ -1,0 +1,11 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "image",
+      "src": "logo.png",
+      "alt": "Logo"
+    }
+  ],
+  "metadata": null
+}

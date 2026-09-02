@@ -1,0 +1,17 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "link",
+          "url": "https://openai.com",
+          "title": null,
+          "children": [{"type": "text", "value": "OpenAI"}]
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

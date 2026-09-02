@@ -1,0 +1,70 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Visit "
+        },
+        {
+          "type": "link",
+          "url": "https://example.com",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "value": "https://example.com"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": " today."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Email "
+        },
+        {
+          "type": "link",
+          "url": "mailto:user@example.com",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "value": "user@example.com"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": "."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "link",
+          "url": "https://example.com/docs",
+          "title": null,
+          "children": [
+            {
+              "type": "text",
+              "value": "Reference link"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

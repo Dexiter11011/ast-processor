@@ -1,0 +1,20 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Quote text"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

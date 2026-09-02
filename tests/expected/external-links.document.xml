@@ -1,0 +1,47 @@
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Normal"/>
+      </w:pPr>
+      <w:hyperlink w:history="1" r:id="rId2">
+        <w:r>
+          <w:rPr>
+            <w:u w:val="single"/>
+            <w:color w:val="0563C1"/>
+          </w:rPr>
+          <w:t>A</w:t>
+        </w:r>
+      </w:hyperlink>
+      <w:r>
+        <w:t>
+</w:t>
+      </w:r>
+      <w:hyperlink w:history="1" r:id="rId2">
+        <w:r>
+          <w:rPr>
+            <w:u w:val="single"/>
+            <w:color w:val="0563C1"/>
+          </w:rPr>
+          <w:t>B</w:t>
+        </w:r>
+      </w:hyperlink>
+      <w:r>
+        <w:t>
+</w:t>
+      </w:r>
+      <w:hyperlink w:history="1" r:id="rId3">
+        <w:r>
+          <w:rPr>
+            <w:u w:val="single"/>
+            <w:color w:val="0563C1"/>
+          </w:rPr>
+          <w:t>C</w:t>
+        </w:r>
+      </w:hyperlink>
+    </w:p>
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+    </w:sectPr>
+  </w:body>
+</w:document>

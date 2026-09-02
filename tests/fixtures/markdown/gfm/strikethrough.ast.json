@@ -1,0 +1,107 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "strikethrough",
+          "children": [
+            {
+              "type": "text",
+              "value": "deleted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "strikethrough",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bold deleted"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "strong",
+          "children": [
+            {
+              "type": "strikethrough",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bold deleted"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "normal "
+        },
+        {
+          "type": "strikethrough",
+          "children": [
+            {
+              "type": "text",
+              "value": "deleted"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": " normal"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "strikethrough",
+          "children": [
+            {
+              "type": "text",
+              "value": "one"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "type": "strikethrough",
+          "children": [
+            {
+              "type": "text",
+              "value": "two"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

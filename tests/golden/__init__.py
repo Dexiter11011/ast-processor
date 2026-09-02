@@ -1,0 +1,1 @@
+"""Golden XML snapshot tests."""

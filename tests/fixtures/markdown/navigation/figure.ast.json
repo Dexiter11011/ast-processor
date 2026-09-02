@@ -1,0 +1,18 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "logo.png",
+        "alt": "Architecture overview"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "Architecture overview"
+      }
+    }
+  ],
+  "metadata": null
+}

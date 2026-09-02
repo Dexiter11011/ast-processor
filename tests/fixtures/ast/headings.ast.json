@@ -1,0 +1,21 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [{"type": "text", "value": "One"}]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "children": [{"type": "text", "value": "Two"}]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "children": [{"type": "text", "value": "Three"}]
+    }
+  ],
+  "metadata": null
+}

@@ -1,0 +1,78 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "One"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Two"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "First"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Second"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

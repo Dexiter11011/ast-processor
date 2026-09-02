@@ -1,0 +1,235 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "table_of_contents",
+      "min_level": 1,
+      "max_level": 2
+    },
+    {
+      "type": "list_of_figures"
+    },
+    {
+      "type": "list_of_tables"
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Introduction"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Architecture"
+        }
+      ]
+    },
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "logo.png",
+        "alt": "Architecture overview"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "Architecture overview"
+      }
+    },
+    {
+      "type": "cross_reference",
+      "reference": {
+        "target": "figure-architecture-overview",
+        "kind": "figure",
+        "prefix": "See ",
+        "display": ""
+      }
+    },
+    {
+      "type": "table_with_caption",
+      "table": {
+        "type": "table",
+        "rows": [
+          {
+            "type": "table_row",
+            "cells": [
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Metric"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              },
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Score"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              }
+            ],
+            "header": true
+          },
+          {
+            "type": "table_row",
+            "cells": [
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Latency"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              },
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "12"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              }
+            ],
+            "header": false
+          }
+        ],
+        "column_aligns": [
+          "",
+          ""
+        ],
+        "borders": "single"
+      },
+      "caption": {
+        "kind": "table",
+        "text": "Benchmark results"
+      }
+    },
+    {
+      "type": "cross_reference",
+      "reference": {
+        "target": "table-benchmark-results",
+        "kind": "table",
+        "prefix": "See ",
+        "display": ""
+      }
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Results"
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Task complete"
+                }
+              ]
+            }
+          ],
+          "checked": true
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "value": " caption context nearby"
+                }
+              ]
+            }
+          ],
+          "checked": null
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

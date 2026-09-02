@@ -1,0 +1,20 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "inline_code",
+          "value": "inline"
+        }
+      ]
+    },
+    {
+      "type": "code_block",
+      "value": "print(1)\n",
+      "language": "python"
+    }
+  ],
+  "metadata": null
+}

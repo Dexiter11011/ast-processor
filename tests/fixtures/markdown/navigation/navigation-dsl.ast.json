@@ -1,0 +1,180 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "table_of_contents",
+      "min_level": 1,
+      "max_level": 2
+    },
+    {
+      "type": "list_of_figures"
+    },
+    {
+      "type": "list_of_tables"
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Vvedenie"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Arhitektura"
+        }
+      ]
+    },
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "logo.png",
+        "alt": "Obzor arhitektury"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "Obzor arhitektury"
+      }
+    },
+    {
+      "type": "cross_reference",
+      "reference": {
+        "target": "figure-obzor-arhitektury",
+        "kind": "figure",
+        "prefix": "Sm. ",
+        "display": ""
+      }
+    },
+    {
+      "type": "table_with_caption",
+      "table": {
+        "type": "table",
+        "rows": [
+          {
+            "type": "table_row",
+            "cells": [
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Parametr"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              },
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Znachenie"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              }
+            ],
+            "header": true
+          },
+          {
+            "type": "table_row",
+            "cells": [
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "Timeout"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              },
+              {
+                "type": "table_cell",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "30"
+                      }
+                    ]
+                  }
+                ],
+                "align": "",
+                "bg": "",
+                "valign": "",
+                "colspan": 1,
+                "rowspan": 1,
+                "merged": false,
+                "vmerge_continue": false
+              }
+            ],
+            "header": false
+          }
+        ],
+        "column_aligns": [
+          "",
+          ""
+        ],
+        "borders": "single"
+      },
+      "caption": {
+        "kind": "table",
+        "text": "Konfiguracionnye parametry"
+      }
+    },
+    {
+      "type": "cross_reference",
+      "reference": {
+        "target": "table-konfiguracionnye-parametry",
+        "kind": "table",
+        "prefix": "Sm. ",
+        "display": ""
+      }
+    }
+  ],
+  "metadata": null
+}

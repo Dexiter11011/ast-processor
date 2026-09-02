@@ -1,0 +1,45 @@
+name: corporate
+
+typography:
+  body:
+    family: Arial
+    size: 11pt
+  heading:
+    family: Arial
+  code:
+    family: Consolas
+    size: 10pt
+
+colors:
+  text: "222222"
+  heading: "123456"
+  link: "0563C1"
+  code: "333333"
+  quote: "666666"
+
+spacing:
+  paragraph_after: 6pt
+  heading1_before: 12pt
+  heading1_after: 6pt
+  list_indent: 0.25in
+
+headings:
+  heading1: 28pt
+  heading2: 20pt
+  heading3: 16pt
+
+page:
+  size: A4
+  orientation: portrait
+  emit_margins: true
+  margins:
+    top: 2cm
+    right: 2cm
+    bottom: 2cm
+    left: 2cm
+
+link:
+  underline: single
+
+table:
+  header_bold: true

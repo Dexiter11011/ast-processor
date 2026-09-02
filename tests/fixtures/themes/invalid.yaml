@@ -1,0 +1,6 @@
+name: minimal
+
+styles:
+  heading1:
+    run:
+      color: "111111"

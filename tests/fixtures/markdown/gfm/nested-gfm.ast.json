@@ -1,0 +1,316 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "heading",
+      "level": 1,
+      "children": [
+        {
+          "type": "strong",
+          "children": [
+            {
+              "type": "text",
+              "value": "Project "
+            },
+            {
+              "type": "strikethrough",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Deprecated"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Completed"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "checked": true
+        },
+        {
+          "type": "list_item",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "emphasis",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Pending"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "items": [
+                {
+                  "type": "list_item",
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "strikethrough",
+                          "children": [
+                            {
+                              "type": "text",
+                              "value": "Old task"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "checked": true
+                }
+              ]
+            }
+          ],
+          "checked": false
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Warning:"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": " see "
+            },
+            {
+              "type": "link",
+              "url": "https://example.com",
+              "title": null,
+              "children": [
+                {
+                  "type": "text",
+                  "value": "https://example.com"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "rows": [
+        {
+          "type": "table_row",
+          "cells": [
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Status"
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            },
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Description"
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            }
+          ],
+          "header": true
+        },
+        {
+          "type": "table_row",
+          "cells": [
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "strikethrough",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "Old"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            },
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "strong",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "Deprecated"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            }
+          ],
+          "header": false
+        },
+        {
+          "type": "table_row",
+          "cells": [
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Done"
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            },
+            {
+              "type": "table_cell",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "inline_code",
+                      "value": "Working"
+                    }
+                  ]
+                }
+              ],
+              "align": "",
+              "bg": "",
+              "valign": "",
+              "colspan": 1,
+              "rowspan": 1,
+              "merged": false,
+              "vmerge_continue": false
+            }
+          ],
+          "header": false
+        }
+      ],
+      "column_aligns": [
+        "",
+        ""
+      ],
+      "borders": "single"
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Formatted line"
+        },
+        {
+          "type": "line_break"
+        },
+        {
+          "type": "text",
+          "value": "with hard break."
+        }
+      ]
+    }
+  ],
+  "metadata": null
+}

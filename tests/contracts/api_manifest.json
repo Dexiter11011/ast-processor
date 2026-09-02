@@ -1,0 +1,63 @@
+{
+  "api_version": "1",
+  "tier_a": {
+    "module": "md2docx.plugin_api",
+    "symbols": [
+      {"name": "PLUGIN_API_VERSION", "kind": "constant"},
+      {"name": "DirectiveDefinition", "kind": "class"},
+      {"name": "DuplicateRegistrationError", "kind": "exception"},
+      {"name": "InvalidPluginNameError", "kind": "exception"},
+      {"name": "Plugin", "kind": "protocol"},
+      {"name": "PluginContext", "kind": "class"},
+      {"name": "PluginError", "kind": "exception"},
+      {"name": "PluginLoadError", "kind": "exception"},
+      {"name": "PluginMetadata", "kind": "class"},
+      {"name": "PluginRegistry", "kind": "class"},
+      {"name": "RegistryFrozenError", "kind": "exception"},
+      {"name": "ReservedNameError", "kind": "exception"},
+      {"name": "TemplateRegionDefinition", "kind": "class"},
+      {"name": "UnsupportedApiVersionError", "kind": "exception"},
+      {"name": "ValidationPhase", "kind": "enum"},
+      {"name": "ValidatorDefinition", "kind": "class"}
+    ]
+  },
+  "tier_b": {
+    "modules": [
+      {
+        "module": "md2docx.styles.definition",
+        "symbols": [
+          {"name": "StyleDefinition", "kind": "class"},
+          {"name": "ParagraphStyle", "kind": "class"},
+          {"name": "RunStyle", "kind": "class"}
+        ]
+      },
+      {
+        "module": "md2docx.ooxml.api",
+        "symbols": [
+          {"name": "paragraph", "kind": "function"},
+          {"name": "run", "kind": "function"},
+          {"name": "text", "kind": "function"}
+        ]
+      },
+      {
+        "module": "md2docx.semantic",
+        "symbols": [
+          {"name": "RichDocumentFragment", "kind": "class"},
+          {"name": "SemanticContext", "kind": "class"},
+          {"name": "Paragraph", "kind": "class"},
+          {"name": "fragment", "kind": "function"},
+          {"name": "paragraph", "kind": "function"},
+          {"name": "text", "kind": "function"},
+          {"name": "bold", "kind": "function"},
+          {"name": "italic", "kind": "function"},
+          {"name": "hyperlink", "kind": "function"},
+          {"name": "line_break", "kind": "function"},
+          {"name": "image", "kind": "function"},
+          {"name": "figure", "kind": "function"},
+          {"name": "bullet_list", "kind": "function"},
+          {"name": "SemanticError", "kind": "exception"}
+        ]
+      }
+    ]
+  }
+}

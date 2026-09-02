@@ -1,0 +1,27 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "logo.png",
+        "alt": "Architecture overview"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "Architecture overview"
+      }
+    },
+    {
+      "type": "cross_reference",
+      "reference": {
+        "target": "figure-architecture-overview",
+        "kind": "figure",
+        "prefix": "See ",
+        "display": ""
+      }
+    }
+  ],
+  "metadata": null
+}

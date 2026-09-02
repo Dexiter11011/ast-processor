@@ -1,0 +1,33 @@
+{
+  "type": "document",
+  "children": [
+    {
+      "type": "list_of_figures"
+    },
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "one.png",
+        "alt": "First"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "First figure"
+      }
+    },
+    {
+      "type": "figure",
+      "image": {
+        "type": "image",
+        "src": "two.png",
+        "alt": "Second"
+      },
+      "caption": {
+        "kind": "figure",
+        "text": "Second figure"
+      }
+    }
+  ],
+  "metadata": null
+}
