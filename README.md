@@ -1,22 +1,22 @@
 # md2docx
 
-Standalone CLI that converts Markdown to DOCX through an explicit **AST → OOXML** pipeline.
+Автономный CLI, который конвертирует Markdown в DOCX через явный конвейер **AST → OOXML**.
 
-The tool builds a real Office Open XML package — `document.xml`, `styles.xml`, `numbering.xml`, relationships, media, and `[Content_Types].xml` — without delegating document generation to a black-box DOCX library.
+Инструмент собирает настоящий пакет Office Open XML — `document.xml`, `styles.xml`, `numbering.xml`, relationships, media и `[Content_Types].xml` — без делегирования генерации документа чёрному ящику DOCX-библиотеки.
 
-This project is **independent** from `document-platform-ver2`. It lives in the same git repository but has no Python import dependencies on the platform.
+Проект **независим** от `document-platform-ver2`. Он живёт в том же git-репозитории, но не имеет Python-зависимостей на платформу.
 
-## What it does
+## Что делает
 
-1. Reads a Markdown file (optional YAML front matter for metadata).
-2. Parses Markdown into a typed **AST** (Abstract Syntax Tree).
-3. Walks the AST with a single **AstProcessor**, dispatching each node to a dedicated **element handler**.
-4. Handlers call the **OOXML layer** to build WordprocessingML elements.
-5. Assembles a valid **DOCX** (ZIP archive with XML parts and media).
+1. Читает Markdown-файл (опциональный YAML front matter для метаданных).
+2. Парсит Markdown в типизированное **AST** (Abstract Syntax Tree).
+3. Обходит AST одним **AstProcessor**, направляя каждый узел в dedicated **element handler**.
+4. Handlers вызывают слой **OOXML** для построения элементов WordprocessingML.
+5. Собирает валидный **DOCX** (ZIP-архив с XML-частями и медиа).
 
-Supported elements include paragraphs, headings, bold/italic, inline code, links, lists, blockquotes, horizontal rules, code blocks, images, and tables (with formatting directives).
+Поддерживаются абзацы, заголовки, жирный/курсив, inline-код, ссылки, списки, цитаты, горизонтальные линии, блоки кода, изображения и таблицы (с директивами форматирования).
 
-## Install
+## Установка
 
 ```bash
 cd ast-processor
@@ -25,41 +25,41 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-Requires **Python 3.9+**.
+Требуется **Python 3.9+**.
 
-## Run
+## Запуск
 
 ```bash
-md2docx input.md                  # writes input.docx next to the source file
-md2docx input.md -o output.docx   # explicit output path
-md2docx input.md -o output.docx --validate   # convert and validate OOXML package
+md2docx input.md                  # пишет input.docx рядом с исходником
+md2docx input.md -o output.docx   # явный путь вывода
+md2docx input.md -o output.docx --validate   # конвертация и валидация OOXML-пакета
 md2docx README.md \
   --title "Final Documentation" \
   --author "John Doe" \
   --date 2026-08-31 \
-  -o README.docx                  # CLI overrides YAML front matter (per field)
+  -o README.docx                  # CLI перекрывает YAML front matter (по полям)
 md2docx --help
 md2docx --version
 ```
 
-Document metadata (title, author, date, subject, keywords) resolves from CLI and YAML front matter into a single model used by template placeholders, core properties, and dynamic fields. See [`docs/DOCUMENT_METADATA.md`](docs/DOCUMENT_METADATA.md).
+Метаданные документа (title, author, date, subject, keywords) собираются из CLI и YAML front matter в единую модель для плейсхолдеров шаблона, core properties и динамических полей. См. [`docs/DOCUMENT_METADATA.md`](docs/DOCUMENT_METADATA.md).
 
-Errors are printed to stderr (see [`docs/ERROR_HANDLING.md`](docs/ERROR_HANDLING.md)):
+Ошибки печатаются в stderr (см. [`docs/ERROR_HANDLING.md`](docs/ERROR_HANDLING.md)):
 
 ```text
 Error: input file does not exist: document.md
 Error: unsupported AST node: footnote
 ```
 
-Use `--debug` for a full traceback on unexpected internal errors. With `--validate`, invalid output is detected before the final file is replaced, so an existing output file is preserved on validation failure.
+Флаг `--debug` выводит полный traceback для неожиданных внутренних ошибок. С `--validate` невалидный вывод обнаруживается до замены финального файла, поэтому существующий output сохраняется при ошибке валидации.
 
-## Architecture
+## Архитектура
 
-Layers are strictly separated. Each layer has one job and must not leak concerns into adjacent layers.
+Слои строго разделены. У каждого слоя одна задача — он не должен протекать в соседние.
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│  CLI (cli/)           argument parsing, exit codes          │
+│  CLI (cli/)           разбор аргументов, коды выхода        │
 └───────────────────────────────┬─────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────┐
@@ -67,44 +67,44 @@ Layers are strictly separated. Each layer has one job and must not leak concerns
 └───────────────────────────────┬─────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────┐
-│  AST (ast/)           typed node definitions                │
+│  AST (ast/)           типизированные определения узлов      │
 └───────────────────────────────┬─────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────┐
 │  Processor (processor/)                                       │
-│    AstProcessor       single tree walk, handler dispatch      │
-│    HandlerRegistry    type → handler map                      │
-│    ProcessingContext  shared document, rels, styles, media    │
+│    AstProcessor       один обход дерева, диспетчеризация      │
+│    HandlerRegistry    type → handler                          │
+│    ProcessingContext  общий document, rels, styles, media     │
 └───────────────────────────────┬─────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────┐
-│  Elements (elements/)  one handler per Markdown element       │
+│  Elements (elements/)  один handler на элемент Markdown       │
 └───────────────────────────────┬─────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────┐
-│  OOXML (ooxml/)       WordprocessingML builders + API         │
-│    api.py             facade used by handlers                 │
-│    xml_builder.py     safe lxml serialization                 │
-│    package.py         DOCX ZIP assembly (lowest OOXML layer)  │
+│  OOXML (ooxml/)       builders WordprocessingML + API         │
+│    api.py             фасад для handlers                      │
+│    xml_builder.py     безопасная сериализация lxml            │
+│    package.py         сборка DOCX ZIP (нижний слой OOXML)     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-| Layer | Location | Responsibility |
-|-------|----------|----------------|
-| CLI | `src/md2docx/cli/` | User interface, error messages |
-| Parser | `src/md2docx/parser/` | Markdown → AST (no OOXML) |
-| AST | `src/md2docx/ast/` | Typed node dataclasses |
-| Processor | `src/md2docx/processor/` | AST walk, registry, shared context |
-| Elements | `src/md2docx/elements/` | One handler per element type |
-| OOXML | `src/md2docx/ooxml/` | XML generation, DOCX package |
+| Слой | Расположение | Ответственность |
+|------|--------------|-----------------|
+| CLI | `src/md2docx/cli/` | Пользовательский интерфейс, сообщения об ошибках |
+| Parser | `src/md2docx/parser/` | Markdown → AST (без OOXML) |
+| AST | `src/md2docx/ast/` | Типизированные dataclass-узлы |
+| Processor | `src/md2docx/processor/` | Обход AST, registry, общий контекст |
+| Elements | `src/md2docx/elements/` | Один handler на тип элемента |
+| OOXML | `src/md2docx/ooxml/` | Генерация XML, пакет DOCX |
 
-**Rule:** Markdown, AST, Processing, OOXML, and ZIP must not be mixed in the same module.
+**Правило:** Markdown, AST, Processing, OOXML и ZIP не должны смешиваться в одном модуле.
 
-## What is the AST?
+## Что такое AST?
 
-The AST is a tree of plain Python dataclasses in `src/md2docx/ast/types.py`. Each node has a `type` string discriminator and fields specific to that construct.
+AST — дерево обычных Python dataclasses в `src/md2docx/ast/types.py`. У каждого узла есть дискриминатор `type` (строка) и поля, специфичные для конструкции.
 
-Example — Markdown `Hello **world**` becomes:
+Пример — Markdown `Hello **world**` становится:
 
 ```text
 Document
@@ -114,45 +114,45 @@ Document
         └── Text("world")
 ```
 
-Block nodes (`Paragraph`, `Heading`, `List`, `Table`, …) sit at document level. Inline nodes (`Text`, `Strong`, `Link`, …) live inside block nodes. The parser produces the AST; handlers consume it. The AST knows nothing about OOXML or Word.
+Блочные узлы (`Paragraph`, `Heading`, `List`, `Table`, …) находятся на уровне документа. Inline-узлы (`Text`, `Strong`, `Link`, …) живут внутри блочных. Парсер создаёт AST; handlers его потребляют. AST ничего не знает про OOXML или Word.
 
-## How AST becomes OOXML
+## Как AST становится OOXML
 
-End-to-end flow (`pipeline.py`):
+Сквозной поток (`pipeline.py`):
 
 ```text
 Markdown file
-    → MarkdownParser.parse()          # parser layer
+    → MarkdownParser.parse()          # слой parser
     → Document AST
     → ProcessingContext.create_default()
     → AstProcessor(registry).process_document(ast, context)
          for each node:
            handler = registry.get(node.type)
            handler.process(node, context, processor)
-    → OoxmlDocument (accumulated w:p, w:tbl, … in memory)
-    → DocxPackageWriter.write_from_context()   # ZIP + all XML parts
+    → OoxmlDocument (накопленные w:p, w:tbl, … в памяти)
+    → DocxPackageWriter.write_from_context()   # ZIP + все XML-части
     → output.docx
 ```
 
-**AstProcessor** is a thin dispatcher — it never builds XML itself:
+**AstProcessor** — тонкий диспетчер: сам XML он не строит:
 
 ```python
 handler = registry.get(node.type)   # raises UnsupportedNodeError if missing
 handler.process(node, context, processor)
 ```
 
-Handlers produce OOXML through two paths:
+Handlers производят OOXML двумя путями:
 
-- **Inline content** — append runs to `context.run_collector`, then a parent handler (e.g. `ParagraphHandler`) flushes them into a paragraph.
-- **Block content** — call `context.document.add_*()` helpers that append body-level elements.
+- **Inline-контент** — добавляют runs в `context.run_collector`, затем родительский handler (например, `ParagraphHandler`) сбрасывает их в абзац.
+- **Блочный контент** — вызывают `context.document.add_*()`, которые добавляют элементы уровня body.
 
-All XML is built via **lxml** through `ooxml/xml_builder.py`. User text is never concatenated into tag strings; the serializer handles escaping.
+Весь XML строится через **lxml** в `ooxml/xml_builder.py`. Пользовательский текст никогда не конкатенируется в строки тегов; экранирование делает сериализатор.
 
-After processing, `DocxPackageWriter` wraps the body in `word/document.xml`, adds `styles.xml`, optional `numbering.xml`, relationship files, media parts, and `[Content_Types].xml`, then writes the ZIP.
+После обработки `DocxPackageWriter` оборачивает body в `word/document.xml`, добавляет `styles.xml`, опциональный `numbering.xml`, файлы relationships, media-части и `[Content_Types].xml`, затем пишет ZIP.
 
-## Rendering context
+## Контекст рендеринга
 
-Inline formatting (bold, italic, inline code) flows through an explicit **RenderContext** instead of post-hoc run mutation.
+Inline-форматирование (жирный, курсив, inline-код) проходит через явный **RenderContext**, а не через постфактум-мутацию runs.
 
 ```text
 AST inline node
@@ -164,17 +164,17 @@ AST inline node
     → apply_inline_formatting → w:rPr (w:b, w:i, w:rStyle)
 ```
 
-`ProcessingContext` carries both transient collectors and rendering state:
+`ProcessingContext` несёт и временные коллекторы, и состояние рендеринга:
 
 ```text
 ProcessingContext
-├── document, relationships, styles, numbering, media   (shared infrastructure)
-├── run_collector                                       (inline run accumulation)
+├── document, relationships, styles, numbering, media   (общая инфраструктура)
+├── run_collector                                       (накопление inline runs)
 └── render_context: RenderContext
       └── formatting: InlineFormatting { bold, italic, code }
 ```
 
-**Example trace** — Markdown `**bold *italic***`:
+**Пример трассы** — Markdown `**bold *italic***`:
 
 ```text
 StrongHandler   → derive(bold=True)
@@ -182,37 +182,37 @@ StrongHandler   → derive(bold=True)
     TextHandler   → run_from_formatting("italic", bold=True, italic=True)
 ```
 
-Hyperlink relationship IDs stay in `RelationshipManager` — never in `InlineFormatting`.
+ID relationships для гиперссылок остаются в `RelationshipManager` — никогда в `InlineFormatting`.
 
-See [`docs/RENDERING_CONTEXT.md`](docs/RENDERING_CONTEXT.md) for the full architecture note.
+Полное архитектурное описание: [`docs/RENDERING_CONTEXT.md`](docs/RENDERING_CONTEXT.md).
 
-## Style system
+## Система стилей
 
-Document-level presentation (headings, quotes, code blocks, lists) flows through a **StyleRegistry** backed by immutable **StyleDefinition** objects.
+Презентация на уровне документа (заголовки, цитаты, блоки кода, списки) идёт через **StyleRegistry** на основе неизменяемых объектов **StyleDefinition**.
 
 ```text
 AST block node
-    → Handler selects semantic role (heading1, quote, normal, …)
+    → Handler выбирает семантическую роль (heading1, quote, normal, …)
     → StyleManager.to_ooxml(semantic_id)
     → document.xml w:pStyle / w:rStyle
     → StylesXmlWriter(registry) → word/styles.xml
 ```
 
-**Style System** (paragraph/character styles) and **Render Context** (inline bold/italic/code) are separate:
+**Style System** (paragraph/character styles) и **Render Context** (inline bold/italic/code) разделены:
 
 ```text
 # **Hello**  →  pStyle=Heading1  +  run bold=true
 ```
 
-See [`docs/STYLE_SYSTEM.md`](docs/STYLE_SYSTEM.md), [`docs/LISTS_AND_TABLES.md`](docs/LISTS_AND_TABLES.md), and [`docs/SECTIONS_AND_LAYOUT.md`](docs/SECTIONS_AND_LAYOUT.md).
+См. [`docs/STYLE_SYSTEM.md`](docs/STYLE_SYSTEM.md), [`docs/LISTS_AND_TABLES.md`](docs/LISTS_AND_TABLES.md) и [`docs/SECTIONS_AND_LAYOUT.md`](docs/SECTIONS_AND_LAYOUT.md).
 
-## How to add a new Markdown element
+## Как добавить новый элемент Markdown
 
-Adding an element is a **local change** across layers. You do **not** rewrite `AstProcessor`.
+Добавление элемента — **локальное изменение** по слоям. Переписывать `AstProcessor` **не нужно**.
 
-Below is a complete sketch for footnotes (`[^1]`). Adapt names and OOXML details to your spec.
+Ниже полный набросок для сносок (`[^1]`). Адаптируйте имена и детали OOXML под свою спецификацию.
 
-### Step 1 — AST type (`ast/types.py`)
+### Шаг 1 — тип AST (`ast/types.py`)
 
 ```python
 @dataclass
@@ -222,13 +222,13 @@ class Footnote:
     children: list[InlineNode] = field(default_factory=list)
 ```
 
-Add `Footnote` to the `InlineNode` (or `BlockNode`) union.
+Добавьте `Footnote` в union `InlineNode` (или `BlockNode`).
 
-### Step 2 — Parser (`parser/markdown_parser.py`)
+### Шаг 2 — Parser (`parser/markdown_parser.py`)
 
-Extend the markdown-it token walk to emit `Footnote` nodes when the parser encounters footnote syntax. Parser code must not import handlers or OOXML.
+Расширьте обход токенов markdown-it, чтобы эмитить узлы `Footnote` при встрече синтаксиса сносок. Код парсера не должен импортировать handlers или OOXML.
 
-### Step 3 — Handler (`elements/footnote.py`)
+### Шаг 3 — Handler (`elements/footnote.py`)
 
 ```python
 from md2docx.ast.types import Footnote
@@ -250,25 +250,25 @@ class FootnoteHandler:
         context.run_collector.append(api.footnote_run(runs, footnote_id=node.id))
 ```
 
-Handlers use **`md2docx.ooxml.api`** only — not low-level builder modules directly.
+Handlers используют только **`md2docx.ooxml.api`** — не низкоуровневые builder-модули напрямую.
 
-### Step 4 — OOXML (`ooxml/footnote.py` + `ooxml/api.py`)
+### Шаг 4 — OOXML (`ooxml/footnote.py` + `ooxml/api.py`)
 
-Implement WordprocessingML for footnotes in the OOXML layer:
+Реализуйте WordprocessingML для сносок в слое OOXML:
 
 ```python
-# ooxml/footnote.py — internal builder using xml_builder.element()
+# ooxml/footnote.py — внутренний builder через xml_builder.element()
 def build_footnote_run(children: list[Element], *, footnote_id: str) -> Element:
     ...
 
-# ooxml/api.py — expose to handlers
+# ooxml/api.py — фасад для handlers
 def footnote_run(runs: list[Element], *, footnote_id: str) -> Element:
     return build_footnote_run(runs, footnote_id=footnote_id)
 ```
 
-If footnotes need a new package part (`footnotes.xml`), extend `RelationshipManager`, `content_types.py`, and `DocxPackageWriter` — still without touching the processor.
+Если сноскам нужна новая часть пакета (`footnotes.xml`), расширьте `RelationshipManager`, `content_types.py` и `DocxPackageWriter` — по-прежнему не трогая processor.
 
-### Step 5 — Register the handler (`elements/__init__.py`)
+### Шаг 5 — Регистрация handler (`elements/__init__.py`)
 
 ```python
 from md2docx.elements.footnote import FootnoteHandler
@@ -276,73 +276,73 @@ from md2docx.elements.footnote import FootnoteHandler
 def create_default_registry() -> HandlerRegistry:
     return (
         HandlerRegistry()
-        # … existing handlers …
+        # … существующие handlers …
         .register("footnote", FootnoteHandler())
     )
 ```
 
-That is the only wiring change outside your new files. `AstProcessor` stays unchanged.
+Это единственное «протягивание» проводки вне новых файлов. `AstProcessor` остаётся без изменений.
 
-### Step 6 — Tests
+### Шаг 6 — Тесты
 
-| Kind | Location | Purpose |
-|------|----------|---------|
-| Parser unit test | `tests/parser/test_footnote_parser.py` | Markdown → AST |
-| Handler unit test | `tests/elements/test_footnote.py` | AST → OOXML fragments |
-| Golden test | `tests/expected/footnote.document.xml` | Full `document.xml` snapshot |
-| Integration test | `tests/integration/test_footnote_docx.py` | End-to-end DOCX |
+| Вид | Расположение | Назначение |
+|-----|--------------|------------|
+| Unit-тест парсера | `tests/parser/test_footnote_parser.py` | Markdown → AST |
+| Unit-тест handler | `tests/elements/test_footnote.py` | AST → фрагменты OOXML |
+| Golden-тест | `tests/expected/footnote.document.xml` | Полный снимок `document.xml` |
+| Интеграционный тест | `tests/integration/test_footnote_docx.py` | Сквозной DOCX |
 
-Regenerate golden files after intentional OOXML changes:
+После намеренных изменений OOXML перегенерируйте golden-файлы:
 
 ```bash
 python scripts/update-golden.py
 # or: pytest tests/golden/ --update-golden
 ```
 
-### Checklist
+### Чеклист
 
-- [ ] AST dataclass + union update
-- [ ] Parser emits the new node type
-- [ ] Handler in `elements/<name>.py`
-- [ ] OOXML builder + `api.py` facade
-- [ ] `registry.register("<type>", …)` in `create_default_registry()`
-- [ ] Tests (parser, handler, golden, integration)
-- [ ] **Do not** modify `AstProcessor` unless the tree-walk algorithm itself changes
+- [ ] Dataclass AST + обновление union
+- [ ] Парсер эмитит новый тип узла
+- [ ] Handler в `elements/<name>.py`
+- [ ] OOXML builder + фасад `api.py`
+- [ ] `registry.register("<type>", …)` в `create_default_registry()`
+- [ ] Тесты (parser, handler, golden, integration)
+- [ ] **Не** меняйте `AstProcessor`, пока не меняется сам алгоритм обхода дерева
 
-## Plugins
+## Плагины
 
-Load trusted Python extensions with `--plugin`:
+Загружайте доверенные Python-расширения через `--plugin`:
 
 ```bash
 md2docx README.md --plugin examples/plugins/notes_plugin.py -o README.docx
 ```
 
-See [`docs/PLUGINS.md`](docs/PLUGINS.md) and [`docs/PLUGIN_API.md`](docs/PLUGIN_API.md).
+См. [`docs/PLUGINS.md`](docs/PLUGINS.md) и [`docs/PLUGIN_API.md`](docs/PLUGIN_API.md).
 
-Preferred plugin rendering flow:
+Предпочтительный поток рендеринга плагина:
 
 ```text
 Directive → Custom AST → Handler → RichDocumentFragment → existing pipeline → DOCX
 ```
 
-Use `md2docx.semantic` for new plugins. See [`docs/API.md`](docs/API.md#rich-semantic-api).
+Для новых плагинов используйте `md2docx.semantic`. См. [`docs/API.md`](docs/API.md#rich-semantic-api).
 
-## API Stability
+## Стабильность API
 
-Public surface is tiered and tested under `tests/contracts/`:
+Публичная поверхность разделена по tier и покрыта тестами в `tests/contracts/`:
 
-| Tier | Surface | Stability |
-|------|---------|-----------|
-| A | `md2docx.plugin_api` (`__all__` only) | Stable v1 |
-| B | `styles.definition`, `ooxml.api` (legacy), `semantic` | Stable plugin adjuncts |
-| C | CLI flags, exit codes, `--plugin` semantics | Behavioral contract |
-| D | `convert_markdown_to_docx`, themes, templates, validation | Experimental programmatic API |
+| Tier | Поверхность | Стабильность |
+|------|-------------|--------------|
+| A | `md2docx.plugin_api` (только `__all__`) | Stable v1 |
+| B | `styles.definition`, `ooxml.api` (legacy), `semantic` | Стабильные дополнения для плагинов |
+| C | CLI-флаги, коды выхода, семантика `--plugin` | Поведенческий контракт |
+| D | `convert_markdown_to_docx`, themes, templates, validation | Экспериментальный programmatic API |
 
-See [`docs/API.md`](docs/API.md) for the manifest and compatibility policy. Plugin authors should follow [`docs/PLUGIN_MIGRATION.md`](docs/PLUGIN_MIGRATION.md). Adding or removing Tier A symbols requires updating `tests/contracts/api_manifest.json`.
+Манифест и политика совместимости: [`docs/API.md`](docs/API.md). Авторам плагинов — [`docs/PLUGIN_MIGRATION.md`](docs/PLUGIN_MIGRATION.md). Добавление или удаление символов Tier A требует обновления `tests/contracts/api_manifest.json`.
 
-## Handler registry
+## Registry handlers
 
-No central `switch` — handlers are registered by AST node type string:
+Нет центрального `switch` — handlers регистрируются по строке типа узла AST:
 
 ```python
 registry = HandlerRegistry()
@@ -352,28 +352,28 @@ registry.register("strong", StrongHandler())
 processor = AstProcessor(registry)
 ```
 
-Built-in wiring lives in `elements.create_default_registry()` (composition root).
+Встроенная проводка живёт в `elements.create_default_registry()` (composition root).
 
 ## ProcessingContext
 
-Every handler receives the same shared context. Handlers must **not** construct their own `RelationshipManager`, `NumberingManager`, etc.
+Каждый handler получает один и тот же общий контекст. Handlers **не должны** создавать собственные `RelationshipManager`, `NumberingManager` и т.п.
 
 ```python
 @dataclass
 class ProcessingContext:
-    document: OoxmlDocument              # accumulating body elements
-    relationships: RelationshipManager   # centralized rId / .rels
-    styles: StyleManager                 # semantic role → Word style id
-    numbering: NumberingManager          # list numId allocation
-    media: MediaManager                  # word/media/* parts
+    document: OoxmlDocument              # накопление элементов body
+    relationships: RelationshipManager   # централизованные rId / .rels
+    styles: StyleManager                 # семантическая роль → Word style id
+    numbering: NumberingManager          # выделение numId для списков
+    media: MediaManager                  # части word/media/*
     # transient: list_level, run_collector, block_style, …
 ```
 
-Created once per conversion via `ProcessingContext.create_default(source_dir=…)`.
+Создаётся один раз на конвертацию через `ProcessingContext.create_default(source_dir=…)`.
 
 ## OOXML API
 
-Handlers call the high-level facade instead of assembling raw XML:
+Handlers вызывают высокоуровневый фасад вместо сборки сырого XML:
 
 ```python
 from md2docx.ooxml import api
@@ -384,173 +384,173 @@ context.document.add_heading(runs, style_id="Heading1")
 context.document.add_table(table_ast, rows)
 ```
 
-Low-level modules (`ooxml/paragraph.py`, `run.py`, `text.py`, …) are internal to the OOXML layer.
+Низкоуровневые модули (`ooxml/paragraph.py`, `run.py`, `text.py`, …) внутренние для слоя OOXML.
 
-## DOCX package parts
+## Части пакета DOCX
 
-`DocxPackageWriter` controls every part of the output:
+`DocxPackageWriter` управляет каждой частью вывода:
 
-| Part | Builder |
-|------|---------|
-| `word/document.xml` | `OoxmlDocument` + body wrapper |
+| Часть | Builder |
+|-------|---------|
+| `word/document.xml` | `OoxmlDocument` + обёртка body |
 | `word/styles.xml` | `ooxml/styles.py` |
-| `word/numbering.xml` | `NumberingManager` (when lists present) |
+| `word/numbering.xml` | `NumberingManager` (когда есть списки) |
 | `word/_rels/document.xml.rels` | `RelationshipManager` |
 | `word/media/*` | `MediaManager` |
-| `docProps/core.xml` | `core_props.py` (with YAML metadata) |
+| `docProps/core.xml` | `core_props.py` (с YAML-метаданными) |
 | `[Content_Types].xml` | `content_types.py` |
 | `_rels/.rels` | `RelationshipManager` |
 
-## DOCX validation
+## Валидация DOCX
 
-Automatic package validator (`md2docx.validation`) checks structural correctness without opening LibreOffice or Word:
+Автоматический валидатор пакета (`md2docx.validation`) проверяет структурную корректность без открытия LibreOffice или Word:
 
 ```text
 Markdown → DOCX → unzip → validate package → validate XML → validate relationships → validate references
 ```
 
-| Check | Category | What it verifies |
-|-------|----------|------------------|
-| ZIP integrity | `package` | archive not corrupt, required parts present |
-| Well-formed XML | `xml` | every `.xml` / `.rels` part parses |
-| UTF-8 | `unicode` | parts decode as UTF-8 |
-| Content Types | `content_types` | each ZIP entry covered by `[Content_Types].xml` |
-| Relationships | `relationships` | `_rels/.rels` and `document.xml.rels` targets resolve |
-| References | `references` | no dangling `r:id` / `r:embed` in `document.xml` |
-| Styles | `styles` | `w:pStyle` / `w:rStyle` reference defined styles |
-| Numbering | `numbering` | `w:numId` values exist in `numbering.xml` |
-| Media | `media` | images have rels, magic bytes match extension |
+| Проверка | Категория | Что проверяет |
+|----------|-----------|---------------|
+| Целостность ZIP | `package` | архив не повреждён, обязательные части на месте |
+| Well-formed XML | `xml` | каждая часть `.xml` / `.rels` парсится |
+| UTF-8 | `unicode` | части декодируются как UTF-8 |
+| Content Types | `content_types` | каждая запись ZIP покрыта `[Content_Types].xml` |
+| Relationships | `relationships` | цели `_rels/.rels` и `document.xml.rels` резолвятся |
+| References | `references` | нет висячих `r:id` / `r:embed` в `document.xml` |
+| Styles | `styles` | `w:pStyle` / `w:rStyle` ссылаются на определённые стили |
+| Numbering | `numbering` | значения `w:numId` есть в `numbering.xml` |
+| Media | `media` | у изображений есть rels, magic bytes совпадают с расширением |
 
 ```bash
-python scripts/validate-docx.py out/bold.docx          # validate one file
-python scripts/validate-docx.py --fixtures             # convert + validate all fixtures
+python scripts/validate-docx.py out/bold.docx          # валидация одного файла
+python scripts/validate-docx.py --fixtures             # конвертация + валидация всех fixtures
 md2docx tests/fixtures/bold.md -o /tmp/bold.docx --validate
-pytest tests/validation/ -q                            # same checks in CI
+pytest tests/validation/ -q                            # те же проверки в CI
 ```
 
-Structural validation catches broken XML, dangling rIds, and missing parts — the usual causes of Word/LibreOffice recovery dialogs. Manual smoke test in Word/LibreOffice is still recommended before release.
+Структурная валидация ловит битый XML, висячие rId и отсутствующие части — типичные причины диалогов восстановления в Word/LibreOffice. Ручной smoke-тест в Word/LibreOffice перед релизом всё равно рекомендуется.
 
-## Testing
+## Тестирование
 
 ```bash
-pytest -q                                    # full suite (~238 tests)
-pytest tests/parser/test_ast_fixtures.py -q  # Markdown → AST snapshots
-pytest tests/golden/ -q                      # document.xml golden files
-pytest tests/validation/ -q                  # DOCX package validation
-pytest tests/architecture/ -q                # layer boundary guards
+pytest -q                                    # полный набор (~238 тестов)
+pytest tests/parser/test_ast_fixtures.py -q  # снимки Markdown → AST
+pytest tests/golden/ -q                      # golden-файлы document.xml
+pytest tests/validation/ -q                  # валидация пакета DOCX
+pytest tests/architecture/ -q                # охрана границ слоёв
 python scripts/validate-docx.py --fixtures
-python scripts/benchmark.py                  # writes out/BENCHMARK.md
+python scripts/benchmark.py                  # пишет out/BENCHMARK.md
 ```
 
-Test matrix: [`docs/TEST_MATRIX.md`](docs/TEST_MATRIX.md).
+Матрица тестов: [`docs/TEST_MATRIX.md`](docs/TEST_MATRIX.md).
 
-Parser AST fixtures live in `tests/fixtures/ast/*.md` + `*.ast.json` (no DOCX involved).
+AST-fixtures парсера живут в `tests/fixtures/ast/*.md` + `*.ast.json` (без DOCX).
 
-Optional LibreOffice gate: `pytest tests/integration/test_libreoffice_compat.py` (skipped if not installed).
+Опциональный гейт LibreOffice: `pytest tests/integration/test_libreoffice_compat.py` (пропускается, если не установлен).
 
-## Supported Markdown
+## Поддерживаемый Markdown
 
-| Construct | Support |
-|-----------|---------|
-| Paragraphs | yes |
-| Headings `#`–`###` | yes |
-| **Bold**, *italic*, nested | yes |
-| `` `inline code` `` | yes |
-| `[links](url)` | yes (external + internal `#anchor`) |
-| `<https://...>` autolinks | yes |
-| `[text][ref]` reference links | yes |
-| `~~strikethrough~~` | yes |
-| `- [ ]` / `- [x]` task lists | yes (glyph prefix) |
-| Hard line break (`  ` / `\`) | yes |
-| `<!-- toc -->` / `<!-- toc: 1-3 -->` | yes |
-| `-` / `1.` lists, nested | yes |
-| `>` blockquote | yes |
-| `---` horizontal rule | yes |
-| Fenced code blocks | yes |
-| `![alt](path)` images (PNG, JPEG, …) | yes |
-| GFM tables + cell directives | yes |
-| YAML front matter | yes |
+| Конструкция | Поддержка |
+|-------------|-----------|
+| Абзацы | да |
+| Заголовки `#`–`###` | да |
+| **Жирный**, *курсив*, вложенные | да |
+| `` `inline code` `` | да |
+| `[links](url)` | да (внешние + внутренние `#anchor`) |
+| `<https://...>` autolinks | да |
+| `[text][ref]` reference links | да |
+| `~~strikethrough~~` | да |
+| `- [ ]` / `- [x]` task lists | да (префикс-глиф) |
+| Жёсткий перенос (`  ` / `\`) | да |
+| `<!-- toc -->` / `<!-- toc: 1-3 -->` | да |
+| `-` / `1.` списки, вложенные | да |
+| `>` цитата | да |
+| `---` горизонтальная линия | да |
+| Fenced code blocks | да |
+| `![alt](path)` изображения (PNG, JPEG, …) | да |
+| GFM-таблицы + cell directives | да |
+| YAML front matter | да |
 
-Images must exist under the Markdown file directory (relative paths only; `../` outside the source tree is rejected). Missing images produce `Error: image not found: ...`.
+Изображения должны существовать под каталогом Markdown-файла (только относительные пути; `../` за пределы дерева источника отклоняется). Отсутствующие изображения дают `Error: image not found: ...`.
 
-## Known limitations
+## Известные ограничения
 
-Not supported in this release:
+Не поддерживается в этом релизе:
 
-- Footnotes, definition lists
-- Raw HTML blocks and inline HTML
-- Bare URL autolink (without `<>`)
-- Math (LaTeX), diagrams (Mermaid)
-- Comments
-- Different first/odd/even page headers
-- Custom Word templates / themes
+- Сноски, definition lists
+- Сырые HTML-блоки и inline HTML
+- Bare URL autolink (без `<>`)
+- Math (LaTeX), диаграммы (Mermaid)
+- Комментарии
+- Разные колонтитулы первой/нечётной/чётной страницы
+- Пользовательские шаблоны / темы Word
 
-Built-in theme system exists internally (`DefaultTheme`, token-based `ThemeResolver`). External theme files and `--theme` CLI are not yet exposed. See [`docs/THEMES.md`](docs/THEMES.md).
+Внутренне есть встроенная система тем (`DefaultTheme`, token-based `ThemeResolver`). Внешние файлы тем и CLI `--theme` пока не выставлены. См. [`docs/THEMES.md`](docs/THEMES.md).
 
-Unsupported AST node types fail with `Error: unsupported AST node: <type>`.
+Неподдерживаемые типы узлов AST завершаются с `Error: unsupported AST node: <type>`.
 
-## Word manual validation checklist
+## Чеклист ручной проверки в Word
 
-After generating a DOCX (especially `integration-article.docx`), open in Microsoft Word:
+После генерации DOCX (особенно `integration-article.docx`) откройте в Microsoft Word:
 
-- [ ] DOCX opens without a repair dialog
-- [ ] Headings display with correct levels and styles
-- [ ] Ordered and unordered lists render correctly (including nested)
-- [ ] Hyperlinks are clickable
-- [ ] Images display at reasonable size
-- [ ] Tables: headers, borders, alignment, merges
-- [ ] Unicode (Cyrillic, CJK, Arabic, emoji) displays correctly
-- [ ] Bold / italic / inline code preserved in body and table cells
+- [ ] DOCX открывается без диалога восстановления
+- [ ] Заголовки отображаются с правильными уровнями и стилями
+- [ ] Нумерованные и маркированные списки корректны (включая вложенные)
+- [ ] Гиперссылки кликабельны
+- [ ] Изображения отображаются разумного размера
+- [ ] Таблицы: заголовки, границы, выравнивание, объединения
+- [ ] Unicode (кириллица, CJK, арабский, emoji) отображается корректно
+- [ ] Жирный / курсив / inline-код сохранены в тексте и ячейках таблиц
 
-## Development
+## Разработка
 
 ```bash
-pytest -q                              # unit, integration, golden, architecture, validation tests
-python scripts/build-out.py            # tests + build all fixture DOCX → out/
+pytest -q                              # unit, integration, golden, architecture, validation
+python scripts/build-out.py            # тесты + сборка всех fixture DOCX → out/
 python scripts/validate-docx.py --fixtures
 python scripts/benchmark.py
-python scripts/update-golden.py        # refresh tests/expected/*.document.xml
+python scripts/update-golden.py        # обновить tests/expected/*.document.xml
 md2docx tests/fixtures/bold.md -o /tmp/bold.docx --validate
 ```
 
-`scripts/build-out.py` writes to `out/`:
+`scripts/build-out.py` пишет в `out/`:
 
-- `test-results.txt` — pytest output
-- `<name>.docx` — generated archives
-- `<name>/` — unzipped DOCX with pretty-printed XML
-- `BUILD_RESULTS.md` — summary
+- `test-results.txt` — вывод pytest
+- `<name>.docx` — сгенерированные архивы
+- `<name>/` — распакованный DOCX с pretty-printed XML
+- `BUILD_RESULTS.md` — сводка
 
-There is no separate lint command configured yet; run `pytest -q` after every change.
+Отдельной lint-команды пока нет; после каждого изменения запускайте `pytest -q`.
 
-## Development rules
+## Правила разработки
 
-1. **Iterate** — do not implement all features at once; ship in small iterations.
-2. **Plan each iteration** — before coding, state Goal, Files, Tests, Expected result.
-3. **Verify** — after each iteration run tests (and lint/build when available).
-4. **Do not regress** — existing fixtures and golden tests must keep passing.
-5. **Keep it simple** — no abstractions until a second use case appears.
-6. **Respect layer boundaries** — Markdown, AST, Processing, OOXML, ZIP stay separate.
-7. **One handler per element** — each Markdown construct maps to one handler class.
-8. **Single processor** — one `AstProcessor` owns the AST walk.
-9. **OOXML in its own layer** — handlers go through `ooxml.api`, not raw XML strings.
-10. **DOCX packaging below OOXML** — ZIP assembly only in `ooxml/package.py`.
+1. **Итерируйте** — не реализуйте все фичи сразу; поставляйте маленькими итерациями.
+2. **Планируйте каждую итерацию** — до кода сформулируйте Goal, Files, Tests, Expected result.
+3. **Проверяйте** — после каждой итерации запускайте тесты (и lint/build, когда есть).
+4. **Не регрессируйте** — существующие fixtures и golden-тесты должны продолжать проходить.
+5. **Держите просто** — без абстракций, пока не появится второй сценарий использования.
+6. **Соблюдайте границы слоёв** — Markdown, AST, Processing, OOXML, ZIP остаются раздельными.
+7. **Один handler на элемент** — каждая конструкция Markdown → один класс handler.
+8. **Один processor** — один `AstProcessor` владеет обходом AST.
+9. **OOXML в своём слое** — handlers идут через `ooxml.api`, не через сырые XML-строки.
+10. **Упаковка DOCX ниже OOXML** — сборка ZIP только в `ooxml/package.py`.
 
-Architecture boundary tests in `tests/architecture/test_layer_boundaries.py` enforce several of these rules automatically.
+Тесты границ архитектуры в `tests/architecture/test_layer_boundaries.py` автоматически проверяют часть этих правил.
 
-## Technology
+## Технологии
 
-This implementation uses **Python** (project spec allows any language; Python was chosen for the standalone prototype):
+Реализация на **Python** (спецификация проекта допускает любой язык; для автономного прототипа выбран Python):
 
-| Concern | Choice |
-|---------|--------|
-| Language | Python 3.9+ |
-| Markdown parser | [markdown-it-py](https://github.com/executablebooks/markdown-it-py) (token stream → AST) |
-| XML | [lxml](https://lxml.de/) via `ooxml/xml_builder.py` (no string-template XML) |
+| Задача | Выбор |
+|--------|-------|
+| Язык | Python 3.9+ |
+| Парсер Markdown | [markdown-it-py](https://github.com/executablebooks/markdown-it-py) (токен-поток → AST) |
+| XML | [lxml](https://lxml.de/) через `ooxml/xml_builder.py` (без XML из строковых шаблонов) |
 | ZIP / DOCX | stdlib `zipfile` |
-| Tests | pytest (unit, integration, golden, architecture) |
+| Тесты | pytest (unit, integration, golden, architecture) |
 | CLI | argparse |
 
-We deliberately **do not** use a library that hides OOXML/DOCX generation (python-docx, pandoc, etc.). We own:
+Мы сознательно **не** используем библиотеку, скрывающую генерацию OOXML/DOCX (python-docx, pandoc и т.п.). Мы владеем:
 
 - `document.xml`
 - `styles.xml`
@@ -559,83 +559,83 @@ We deliberately **do not** use a library that hides OOXML/DOCX generation (pytho
 - media
 - `[Content_Types].xml`
 
-If porting to TypeScript, the same layer split applies: markdown-it or similar → AST → handler registry → XML builder (e.g. lxml equivalent) → ZIP library → Vitest/Jest.
+При портировании на TypeScript действует то же разделение слоёв: markdown-it или аналог → AST → registry handlers → XML builder (эквивалент lxml) → ZIP-библиотека → Vitest/Jest.
 
-## Iteration history
+## История итераций
 
-| Iter | Feature |
-|------|---------|
-| 0 | Scaffold: CLI, AST, processor, OOXML, tests |
-| 1 | Empty Markdown → valid DOCX |
-| 2 | Plain text paragraphs |
-| 3 | Multiple paragraphs |
-| 4 | Headings `#`–`###` |
-| 5–6 | Bold, italic |
-| 7 | Nested inline formatting |
-| 8 | Inline code |
-| 9 | Links + hyperlinks rels |
-| 10–12 | Unordered, ordered, nested lists + numbering.xml |
-| 13 | Blockquote |
-| 14 | Horizontal rule |
+| Итер. | Фича |
+|-------|------|
+| 0 | Scaffold: CLI, AST, processor, OOXML, тесты |
+| 1 | Пустой Markdown → валидный DOCX |
+| 2 | Обычные текстовые абзацы |
+| 3 | Несколько абзацев |
+| 4 | Заголовки `#`–`###` |
+| 5–6 | Жирный, курсив |
+| 7 | Вложенное inline-форматирование |
+| 8 | Inline-код |
+| 9 | Ссылки + hyperlinks rels |
+| 10–12 | Маркированные, нумерованные, вложенные списки + numbering.xml |
+| 13 | Цитата |
+| 14 | Горизонтальная линия |
 | 15 | Fenced code blocks |
-| 16 | XML escaping (safe serialization) |
-| 17 | Images + word/media |
-| 18–20 | Tables, formatting, merges, cell directives |
-| 21 | Nested inline + escaping edge cases |
+| 16 | Экранирование XML (безопасная сериализация) |
+| 17 | Изображения + word/media |
+| 18–20 | Таблицы, форматирование, объединения, cell directives |
+| 21 | Вложенный inline + edge cases экранирования |
 | 22 | YAML front matter → docProps |
-| 23 | Word styles (headings, Quote, Code, NoSpacing) |
-| 24 | Layer boundary refactor, StyleManager/MediaManager |
-| 25 | HandlerRegistry + OOXML API facade |
-| 26 | Safe XML builder (lxml, no f-string XML) |
-| 27 | Golden tests (`tests/expected/*.document.xml`) |
-| 28 | CLI UX (`--help`, `--version`, clear errors) |
-| 29 | DOCX package validator (XML, rels, content types, media) |
-| 30 | Production Readiness Audit (238 tests, `--validate`, AST fixtures, image security) |
-| 31 | Rendering Context & Inline Formatting Model (RenderContext, centralized OOXML formatting) |
+| 23 | Стили Word (заголовки, Quote, Code, NoSpacing) |
+| 24 | Рефакторинг границ слоёв, StyleManager/MediaManager |
+| 25 | HandlerRegistry + фасад OOXML API |
+| 26 | Безопасный XML builder (lxml, без f-string XML) |
+| 27 | Golden-тесты (`tests/expected/*.document.xml`) |
+| 28 | CLI UX (`--help`, `--version`, понятные ошибки) |
+| 29 | Валидатор пакета DOCX (XML, rels, content types, media) |
+| 30 | Production Readiness Audit (238 тестов, `--validate`, AST fixtures, безопасность изображений) |
+| 31 | Rendering Context & Inline Formatting Model (RenderContext, централизованное OOXML-форматирование) |
 | 32 | Style System & Document Theme Foundation (StyleRegistry, DefaultTheme, StylesXmlWriter) |
-| 33 | Lists, Numbering & Table Styles (ListParagraph, numbering separation, TableGrid, tblHeader) |
-| 34 | Sections, Page Layout, Headers & Footers (SectionManager, page/section breaks, header/footer parts) |
-| 35 | Bookmarks, Internal/External Hyperlinks, TOC fields (BookmarkManager, slug anchors, Word TOC field) |
-| 36 | GFM compatibility (task lists, strikethrough, autolinks, hard breaks) |
-| 37 | Document Theme System (tokens, ThemeResolver, theme switching) |
-| 38 | Dynamic DOCX Fields (PAGE, REF, SEQ, header/footer directives) |
-| 39 | Figures, Captions, Sequences & Cross-References (CaptionService, SEQ Figure/Table, REF `\r \h`; internal API) |
-| 40 | Advanced Document Navigation (NavigationRegistry, LOF/LOT, template bookmark remapping, typed REF validation) |
+| 33 | Lists, Numbering & Table Styles (ListParagraph, разделение numbering, TableGrid, tblHeader) |
+| 34 | Sections, Page Layout, Headers & Footers (SectionManager, page/section breaks, части header/footer) |
+| 35 | Bookmarks, Internal/External Hyperlinks, TOC fields (BookmarkManager, slug-якоря, поле TOC Word) |
+| 36 | GFM-совместимость (task lists, strikethrough, autolinks, hard breaks) |
+| 37 | Document Theme System (tokens, ThemeResolver, переключение тем) |
+| 38 | Dynamic DOCX Fields (PAGE, REF, SEQ, директивы header/footer) |
+| 39 | Figures, Captions, Sequences & Cross-References (CaptionService, SEQ Figure/Table, REF `\r \h`; внутренний API) |
+| 40 | Advanced Document Navigation (NavigationRegistry, LOF/LOT, remapping закладок шаблона, typed REF validation) |
 
-## Captions & cross-references (Iteration 20)
+## Подписи и перекрёстные ссылки (Iteration 20)
 
-- Figure captions: supported via internal AST API (`Figure` + `Caption`)
-- Table captions: supported via `TableWithCaption`
-- Figure/table cross-references: `CrossReference` with REF `\r \h`
-- Automatic numbering: Word `SEQ Figure` / `SEQ Table` fields (not Python counters)
-- Markdown caption syntax: **deferred** — see [`docs/FIGURES_AND_REFERENCES.md`](docs/FIGURES_AND_REFERENCES.md)
+- Подписи к рисункам: через внутренний AST API (`Figure` + `Caption`)
+- Подписи к таблицам: через `TableWithCaption`
+- Перекрёстные ссылки на рисунки/таблицы: `CrossReference` с REF `\r \h`
+- Автонумерация: поля Word `SEQ Figure` / `SEQ Table` (не счётчики Python)
+- Markdown-синтаксис подписей: **отложен** — см. [`docs/FIGURES_AND_REFERENCES.md`](docs/FIGURES_AND_REFERENCES.md)
 
-## Document navigation (Iteration 21)
+## Навигация по документу (Iteration 21)
 
-- `NavigationRegistry` — semantic heading/figure/table targets in document order
-- List of Figures / List of Tables — Word `TOC \c` fields (programmatic AST)
-- Template bookmark name remapping — collision suffix `-1`; REF/anchor rewrite in generated fragment
-- Typed cross-reference validation via `ReferenceManager`
-- See [`docs/NAVIGATION.md`](docs/NAVIGATION.md)
+- `NavigationRegistry` — семантические цели heading/figure/table в порядке документа
+- Список рисунков / список таблиц — поля Word `TOC \c` (программный AST)
+- Remapping имён закладок шаблона — суффикс коллизии `-1`; перепись REF/якорей в сгенерированном фрагменте
+- Typed-валидация перекрёстных ссылок через `ReferenceManager`
+- См. [`docs/NAVIGATION.md`](docs/NAVIGATION.md)
 
-## Project layout
+## Структура проекта
 
 ```text
 ast-processor/
 ├── src/md2docx/
-│   ├── cli/           # md2docx command
+│   ├── cli/           # команда md2docx
 │   ├── parser/        # Markdown → AST
-│   ├── ast/           # node types
+│   ├── ast/           # типы узлов
 │   ├── processor/     # AstProcessor, registry, context
-│   ├── elements/      # handlers (one file per element)
-│   ├── ooxml/         # XML builders, API, DOCX writer
-│   └── pipeline.py    # wires layers together
+│   ├── elements/      # handlers (один файл на элемент)
+│   ├── ooxml/         # XML builders, API, writer DOCX
+│   └── pipeline.py    # связывает слои
 ├── tests/
-│   ├── fixtures/      # sample .md files
-│   ├── expected/      # golden document.xml snapshots
-│   ├── golden/        # structural XML comparison tests
-│   ├── integration/   # end-to-end DOCX tests
-│   └── architecture/  # layer boundary guards
+│   ├── fixtures/      # примеры .md
+│   ├── expected/      # golden-снимки document.xml
+│   ├── golden/        # тесты структурного сравнения XML
+│   ├── integration/   # сквозные тесты DOCX
+│   └── architecture/  # охрана границ слоёв
 └── scripts/
     ├── build-out.py
     └── update-golden.py
